@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}}
+
+{%block title%}重心健身房管理系統{%endblock title%}
+
+{% block content %}
+<!-- <script type="text/javascript" src="{{url_for('static',filename='jquery.js')}}"></script> -->
+
+    <hr>
+<table>
+{% for member in members%}
+<tr>
+    <td>{{member.id}}</td>
+    <td>{{member.name}}</td>
+</tr>
+{%endfor%}
+</table>
+<hr>
+
+{% endblock content %}
+
+
+
+  

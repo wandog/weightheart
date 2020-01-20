@@ -1,0 +1,68 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/redmond/jquery-ui.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.js"></script> -->
+    <script type="text/javascript" src="{{url_for('static',filename='jquery.js')}}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/jquery-ui.min.css') }}">
+    <script src="{{url_for('static',filename='jquery-ui.min.js')}}"></script>
+    <meta name="viewport" content="width=device-width">
+    <title>{%block title%}{%endblock title%}</title>
+    <!-- <title>健身房管理系統</title> -->
+  </head>
+  <body onload="w3_open();">
+      
+      
+      
+      <!-- Sidebar -->
+      <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
+          <button class="w3-bar-item w3-button w3-large"
+          onclick="w3_close()">Close &times;</button>
+          <a id="goindex" href="/index" class="w3-bar-item w3-button w3-large">回首頁</a>
+          <a href="/bulletin" class="w3-bar-item w3-button w3-large">電子佈告欄</a>
+          <!-- <a href="#" class="w3-bar-item w3-button w3-large">查詢打卡紀錄</a>
+          <a href="#" class="w3-bar-item w3-button w3-large">行事曆</a> -->
+        </div>
+        
+
+        <div id="main">
+        
+        <div class="w3-teal">
+          <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="w3_open()">&#9776;</button>
+          <div class="w3-container">
+            <h1>{{topbar}}</h1>
+          </div>
+        </div>
+        
+        <!-- <img src="img_car.jpg" alt="Car" style="width:100%"> -->
+        
+        <div class="w3-container">
+        {% block content %}{% endblock content %}
+        </div>
+        
+        </div>
+         
+      
+      
+    <script>
+      function w3_open() {
+        document.getElementById("main").style.marginLeft = "25%";
+        document.getElementById("mySidebar").style.width = "25%";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+      }
+      
+      function w3_close() {
+        document.getElementById("main").style.marginLeft = "0%";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+      }
+    </script>  
+  </body>
+</html>

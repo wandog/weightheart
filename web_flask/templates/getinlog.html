@@ -1,0 +1,77 @@
+{% extends "base.html" %}}
+
+{%block title%}會員入場紀錄{%endblock title%}
+
+{% block content %}
+<style>
+table.blueTable {
+  border: 6px solid #1C6EA4;
+  background-color: #EEEEEE;
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+table.blueTable td, table.blueTable th {
+  border: 1px solid #AAAAAA;
+  padding: 10px 3px;
+}
+table.blueTable tbody td {
+  font-size: 25px;
+  font-weight: bold;
+}
+table.blueTable tr:nth-child(even) {
+  background: #D0E4F5;
+}
+table.blueTable thead {
+  background: #1C6EA4;
+  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+  background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+  border-bottom: 2px solid #444444;
+}
+table.blueTable thead th {
+  font-size: 30px;
+  font-weight: bold;
+  color: #FFFFFF;
+  text-align: center;
+  border-left: 2px solid #D0E4F5;
+}
+table.blueTable thead th:first-child {
+  border-left: none;
+}
+
+table.blueTable tfoot td {
+  font-size: 14px;
+}
+table.blueTable tfoot .links {
+  text-align: right;
+}
+table.blueTable tfoot .links a{
+  display: inline-block;
+  background: #1C6EA4;
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+</style>
+<h1>會員編號:&nbsp;&nbsp;&nbsp;&nbsp;{{memberid}}</h1>
+<h1>{{logexist}}</h1>
+<hr>
+<table class="blueTable">
+<tr><th>紀錄序號</th><th>會員編號</th><th>剩餘儲值次數</th><th>入場時間</th></tr>
+{% for log in result%}
+<tr>
+    <td>{{log.0}}</td>
+    <td>{{log.1}}</td>
+    <td>{{log.2}}</td>
+    <td>{{log.3}}</td>
+</tr>
+{%endfor%}
+</table>
+<hr>
+
+
+
+
+<!-- <script type="text/javascript" src="{{url_for('static',filename='custom.js')}}"></script> -->
+{% endblock content %}

@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}}
+
+{%block title%}員工資料{%endblock title%}
+
+{% block content %}
+    
+<h3 id="h3nationID">身份證字號&nbsp;&nbsp;<input style="width:15%;" class="form-control ts16" id="nationID" type="text" value='{{nationid}}'></h3>
+<h3 id="h3memberID">員工編號&nbsp;&nbsp;&nbsp;&nbsp;{{staffid}}</h3>
+<video id="video" style="width:320px;height:240px;border:solid 1px;display:none;"></video>&nbsp;&nbsp;
+<canvas id="canvas" style="width:320px;height:240px;border:solid 1px"></canvas>&nbsp;&nbsp;
+<!-- <img src=""> -->
+
+<button id="takepic" onclick="startVideoStream();">啟動拍照</button>&nbsp;&nbsp;
+<button id="savepic">拍照</button>&nbsp;&nbsp;
+<button id="CancelSavePic">取消</button> 
+<div>
+<table>
+  <tr><td>姓名</td><td>生日</td><td>電話</td><td>員工角色</td></tr>
+  <tr><td><input class="form-control ts16" id="name" value="{{name}}"></td>
+    <td><input class="form-control ts16" id="birth" value="{{birth_1}}"></td><td>
+  <input class="form-control ts16" id="phone" value="{{phone}}"></td>
+  <td>
+    <input class="form-control ts16" id="memberType" value="{{type_1}}"> 
+  </td>
+  </tr>
+  <tr><td>緊急聯絡人</td><td>關係</td><td>電話</td></tr>
+  <tr><td ><input class="form-control ts16" id="emerName" value="{{emerName}}"></td><td><input value="{{relation}}" class="form-control ts16" id="relation"></td>
+  <td><input class="form-control ts16" id="emerPhone" value={{emerPhone}}>
+  </td></tr>
+  <tr><td>地址</td></tr>
+  <tr><td colspan="3"><input class="form-control ts16" value={{address}} id="mem_address" type="text"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn mybtn2" id="editenable">編輯</button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="btn mybtn2" id="saveNdisableEdit">儲存</button></td></tr>
+</table>
+
+<script type="text/javascript" src="{{url_for('static',filename='staff_data.js')}}"></script>
+{% endblock content %}

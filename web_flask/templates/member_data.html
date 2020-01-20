@@ -1,0 +1,118 @@
+
+{% extends "base.html" %}}
+
+{%block title%}會員資料{%endblock title%}
+
+{% block content %}
+    
+<h3 id="h3nationID">身份證字號&nbsp;&nbsp;<input style="width:15%;" class="form-control ts16" id="nationID" type="text" value='{{nationid}}'></h3>
+<h3 id="h3memberID">會員編號&nbsp;&nbsp;&nbsp;&nbsp;{{memberid}}</h3>
+<video id="video" style="width:320px;height:240px;border:solid 1px;display:none;"></video>&nbsp;&nbsp;
+<canvas id="canvas" style="width:320px;height:240px;border:solid 1px"></canvas>&nbsp;&nbsp;
+<!-- <img src=""> -->
+
+<button id="takepic" onclick="startVideoStream();">啟動拍照</button>&nbsp;&nbsp;
+<button id="savepic">拍照</button>&nbsp;&nbsp;
+<button id="CancelSavePic">取消</button>
+<div>
+<table>
+  <tr><td>姓名</td><td>生日</td><td>電話</td><td>會員型態</td></tr>
+  <tr><td><input class="form-control ts16" id="name" value="{{name}}"></td>
+    <td><input class="form-control ts16" id="birth" value="{{birth_1}}"></td><td>
+  <input class="form-control ts16" id="phone" value="{{phone}}"></td>
+  <td>
+    <input class="form-control ts16" id="memberType" value="{{type_1}}"> 
+  </td>
+  </tr>
+  <tr><td>緊急聯絡人</td><td>關係</td><td>電話</td></tr>
+  <tr><td ><input class="form-control ts16" id="emerName" value="{{emerName}}"></td><td><input value="{{relation}}" class="form-control ts16" id="relation"></td>
+  <td><input class="form-control ts16" id="emerPhone" value={{emerPhone}}>
+  </td></tr>
+  <tr><td>地址</td></tr>
+  <tr><td colspan="3"><input class="form-control ts16" value={{address}} id="mem_address" type="text"></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn mybtn2" id="editenable">編輯</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn mybtn2" id="saveNdisableEdit">儲存</button></td></tr>
+</table>
+
+ </div>
+ <hr>
+ <h3>有效期間與繳費紀錄</h3>
+ <div>
+   <table id="transRec" style="border:solid 2px; width:100%;">
+    <tr>
+    <th style="border:solid 2px;">交易序號</th>
+    <th style="border:solid 2px;">起始日期</th>
+    <th style="border:solid 2px;">結束日期</th>
+    <th style="border:solid 2px;">繳費金額</th>
+    <th style="border:solid 2px;">員工代碼</th>
+    <th style="border:solid 2px;">員工名稱</th>
+    <th style="border:solid 2px;">時間戳記</th></tr>
+     
+    {% for translog in trans %}
+    <tr style="border:solid 2px;">
+      <td>{{ translog.0 }}</td>
+      <td>{{ translog.1 }}</td>
+      <td>{{ translog.6 }}</td>
+      <!-- 金額 -->
+      <td>{{ translog.2 }}</td> 
+      <td>{{ translog.3 }}</td>
+      <td>{{ translog.4 }}</td>
+      <td>{{ translog.5 }}</td>
+    </tr>
+    {% endfor %}
+     <!-- <tr><td style="border:solid 2px;">2019-11-01</td><td style="border:solid 2px;">2020-11-01</td><td style="border:solid 2px;">1800</td><td style="border:solid 2px;">jorker</td><td style="border:solid 2px;">2019-11-1</td></tr> -->
+   </table>
+ </div>
+ <hr>
+<h3>收費相關</h3> 
+<div><table><tr><td>
+  <table id="priceTable" style="border:solid 2px;">
+   <tr><th>會員型態</th><th style="width:150px;text-align: center;">會期時間</th><th style="display:none;width:150px;text-align:center;">計次次數</th><th style="width:100px;">價格</th></tr>
+   <tr>
+   <td>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="vip"checked>VIP<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="normal">一般<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="times">計次
+  </td>
+  <td style="text-align: center;">
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="single" checked>單次<br>
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="month">單月<br>
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="triple">三月<br>
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="six">六月<br>
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="oneyear">一年
+  </td>
+  <td style="display:none;text-align:center;">
+      <input onchange="calPrice_1();" name="Times" type="radio" value="10" checked>10<br>
+      <input onchange="calPrice_1();" name="Times" type="radio" value="20">20<br>
+      <input onchange="calPrice_1();" name="Times" type="radio" value="30">30<br>
+      <input onchange="calPrice_1();" name="Times" type="radio" value="50">50
+  </td>
+  
+      
+  
+  <td id="priceCharge">450<br>新台幣
+    <!-- <br><input type="text"> -->
+  </td>
+  
+  </tr> 
+
+  </table>
+</td><td>起始日&nbsp;<input class="fromDate large hasDatepicker2" id="start_date" type="text"/>&nbsp;&nbsp;&nbsp;&nbsp;
+  到期日&nbsp;<input class="fromDate large hasDatepicker2" id="end_date" type="text"/></td>  
+</tr>
+</table>
+  <br>
+  員工代碼&nbsp;&nbsp;&nbsp;&nbsp;
+  <select id="staffID">
+  {% for s in staff %}
+  <option value='{{s.0}}'>{{s.0}}&nbsp;&nbsp;&nbsp;&nbsp;{{ s.1 }}</option>
+  {% endfor %}
+  </select>
+  &nbsp;&nbsp;&nbsp;&nbsp;<button id="confirmTrans">確認</button>
+</div>
+<hr>
+<!-- <h3>繳費紀錄</h3>
+<div>
+
+
+</div> -->
+<script type="text/javascript" src="{{url_for('static',filename='member_data.js')}}"></script>
+{% endblock content %}

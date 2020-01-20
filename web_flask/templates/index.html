@@ -1,0 +1,178 @@
+
+{% extends "base.html" %}}
+
+{%block title%}重心健身房管理系統{%endblock title%}
+
+{% block content %}
+<!-- <script type="text/javascript" src="{{url_for('static',filename='jquery.js')}}"></script> -->
+
+<h1>會員資料相關</h1>    
+<hr>
+<table style="border-collapse: separate">
+<tr>
+<td style="border:solid 2px #5aa832;padding:10px;border-top-left-radius: 10px;border-bottom-left-radius: 10px;background-color: #32a832;width:300px;">
+    <form action ="{{ url_for('member') }}" method="post">
+            <span style="white-space: nowrap;">會員編號:&nbsp;&nbsp;&nbsp;&nbsp;<br><br><br><input class="form-control ts16" id="memberID" type="text" name="memberID"></span>
+        <!-- <h3>身份證字號:</h3> <input type="text" name="nationID"> -->
+    <br><br><button id="memberQuery" class="btn mybtn2" type="submit" name="submit" value="queryPersonData">會員資料</button>
+    <button id="memberGetInRec" class="btn mybtn2" type="submit" name="submit" value="queryGetInLog">會員入場紀錄</button>
+    
+    </form>
+    
+    
+</td>
+<td style="width:300px;border:solid 2px #5aa832;padding:10px;border-bottom-right-radius: 10px;border-top-right-radius: 10px;background-color: #32a832;">
+        電話號碼&nbsp;&nbsp;<br><br><br><input  class="form-control ts16" id="phoneNumber" type="text"><br><br>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn mybtn2" id="BtnQuerybyPhone" type="button" data-toggle="modal" data-target="#queryIDbyphone" >查詢會員編號</button>
+</td>
+<td style="border-bottom-left-radius:10px;border-top-left-radius:10px;padding:10px;background-color:#32a898;">
+    現在日期:&nbsp;&nbsp;<br><br><br><input class="form-control ts16" type="text" id=presentDate value="">
+</td>
+<td style="border-bottom-right-radius:10px;border-top-right-radius:10px;padding:10px;background-color:#32a898;">
+    現在時間:&nbsp;&nbsp;<br><br><br><input class="form-control ts16" type="text" id=presentTime value="">
+</td>
+</tr>
+</table>
+<hr>
+<h1>會員入場相關</h1>
+<hr>
+<button class="btn mybtn2" id="btnGetIn">年費會員入場</button>&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn mybtn2" id="btnGetInTimes">儲次會員入場</button>
+<hr>
+
+<h1>員工相關</h1>
+<hr>
+<table>
+<tr><td>
+    <form action ="{{ url_for('employee') }}" method="post">
+    <table><tr><td style="padding:20px;">
+        員工編號:&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control ts16" type="text" id="staffID" name="staffID">
+    </td><td style="padding:20px;">身份證字號:&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control ts16" type="text" name="nationID">
+    </td>
+    <td style="padding:20px;">
+        <button class="btn mybtn2" type="submit" name="submit" value="queryStaffData" id="queryStaffData">員工資料</button>
+        <button class="btn mybtn2" type="submit" name="submit" value="queryStaffGetInLog" disabled>員工打卡紀錄</button>
+        <button class="btn mybtn2" type="submit" name="submit" value="queryCourseBooking" disabled>教練課預約</button>
+    </td></tr></table>
+    </form>
+</td></tr>
+</table>
+<hr>
+<h1>員工打卡相關</h1>
+<hr>
+<button class="btn mybtn2" id="btnCard" disabled>員工打卡</button>
+
+<button id="showMsg" style="display:none" class="btn mybtn2" type="button" data-toggle="modal" data-target="#response_modal">show response</button>
+<hr>
+<h1>新增會員或員工資料</h1>
+<hr>
+<table>
+<!-- <tr><td></td><td style="width:400px;text-align: right"><h3></h3></td></tr> -->
+<tr><td>
+<button id="addNewMember" class="btn mybtn2" type="button" data-toggle="modal" data-target="#NewCase" onclick="genID(this.id);">新增會員</button>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<button id="addNewStaff"  class="btn mybtn2" type="button"  data-toggle="modal" data-target="#NewCase" onclick="genID(this.id);">新增員工</button>
+</td>
+</tr>    
+</table>
+
+
+
+
+
+
+<!-- below is for add new member or employee? -->
+<div class="modal fade" id="NewCase" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+<!-- <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90%;"> -->
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="title_add_guys">新增會員</h3>
+        
+    </div>
+    <div id="NewCaseBody" class="modal-body" style="overflow-y: auto;">
+
+    <h3>身份證字號&nbsp;&nbsp;<input id="nationID_add" class="form-control ts16" type="text" style="width:200px;"></h3>
+    <span id=idmsg></span>
+    <h3>會員編號&nbsp;&nbsp;&nbsp;&nbsp;<input id="memberID_add" class="form-control ts16" type="text" style="width:200px;"></h3>
+    <!-- <canvas id="canvas" style="width:120px;height:150px;border:solid 1px"></canvas>&nbsp;&nbsp;
+    <button id="takepic">啟動拍照</button>&nbsp;&nbsp;<button id="savepic">拍照</button> -->
+    <hr>
+    <div>
+    <table style="width:800px;">
+    <tr><td>姓名</td><td>生日</td><td>電話</td></tr>
+    <tr><td><input id="name_add" class="form-control ts16" style="width:70%;"></td>
+        <td><input id="birth_add" class="form-control ts16" style="width:70%;"></td>
+        <td><input  id="phone_add" class="form-control ts16" style="width:70%;"></td>
+        
+    </tr>
+    <tr><td>緊急聯絡人</td><td>關係</td><td>電話</td></tr>
+    <tr><td ><input id="emerName" class="form-control ts16" style="width:70%;"></td><td><input id="relation" class="form-control ts16" style="width:70%;"></td>
+    <td><input id="emerPhone" class="form-control ts16" style="width:70%;">
+    </td></tr>
+    <tr><td>地址</td></tr>
+    <tr><td colspan="2"><input id="address_add" type="text" class="form-control ts16"></td></tr>
+    </table>
+    </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" id="closeModalButton2" class="btn btn-primary mr-auto"  onclick="saveMemberData();">儲存</button>  
+        <button type="button" class="btn btn-primary mr-auto"  data-dismiss="modal">關閉</button>  
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="modal fade" id="response_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="info4entry">入場訊息</h3>       
+    </div>
+    <div class="modal-body" style="overflow-y: auto;">
+        <canvas id="headPhoto" style="width:320px;height:240px;border:solid 1px"></canvas>
+        <span style="font-size:30px" id="response_1"></span>
+        
+    </div>
+    <div class="modal-footer">
+        <button type="button"  class="btn btn-primary mr-auto"  id="close_1" data-dismiss="modal">關閉</button>  
+    </div>
+</div>
+</div>
+</div>
+
+<!-- below is for show msg of member or employee's id? -->
+<div class="modal fade" id="queryIDbyphone" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="showIDmsg">會員編號</h3>       
+    </div>
+    <div class="modal-body" style="overflow-y: auto;">
+        <h3 id="response_memberid"></h3>
+    </div>
+    <div class="modal-footer">
+        <button type="button" id="closeModalButton2" class="btn btn-primary mr-auto"  data-dismiss="modal">關閉</button>  
+    </div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<script type="text/javascript" src="{{url_for('static',filename='custom.js')}}"></script>
+{% endblock content %}
+
+
+
+  

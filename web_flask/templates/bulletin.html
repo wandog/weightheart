@@ -1,0 +1,41 @@
+{% extends "base.html" %}}
+
+{%block title%}電子佈告欄系統{%endblock title%}
+
+{% block content %}
+<style>
+button{
+	height:30px;
+	width:60px;
+	}
+</style>
+<br><br>
+<!-- <div style="width:90%; ">
+    <textarea id="emotion_add" type="text" style="height:200px; " class="form-control ts16" placeholder="請輸入訊息1" value=""></textarea>
+</div> -->
+
+<!-- <form action="/saveBulletin" method="post"> -->
+    <!-- <textarea id="confirmationText" class="text" cols="86" rows ="20" name="confirmationText"></textarea> -->
+    <textarea id="bulletin_0" type="text" name="bulletin0" cols="120" rows ="20" style="height:200px; " class="ts16" placeholder="請輸入訊息1 一列請勿超過16字" value=''>{{b0}}</textarea>
+    <br>
+    <!-- <button id="savebull_0">儲存</button> -->
+<!-- </form> -->
+<br><br>
+<!-- <form action="/saveBulletin"  method="post"> -->
+    <!-- <textarea id="confirmationText" class="text" cols="86" rows ="20" name="confirmationText"></textarea> -->
+    <textarea id="bulletin_1" type="text" name="bulletin1" cols="120" rows ="20" style="height:200px; " class="ts16" placeholder="請輸入訊息2 一列請勿超過16字" value=''>{{b1}}</textarea>
+    <br>
+    <!-- <button id="savebull_1">儲存</button> -->
+</form>
+<br><br>
+<!-- <form action="/saveBulletin"  method="post"> -->
+    <!-- <textarea id="confirmationText" class="text" cols="86" rows ="20" name="confirmationText"></textarea> -->
+    <textarea id="bulletin_2" type="text" name="bulletin2" cols="120" rows ="20" style="height:200px; " class="ts16" placeholder="請輸入訊息3 一列請勿超過16字" value=''>{{b2}}</textarea>
+    <br>
+    <button id="savebull">儲存</button>
+<!-- </form> -->
+
+
+
+<script type="text/javascript" src="{{url_for('static',filename='bulletin.js')}}"></script>
+{% endblock content %}
