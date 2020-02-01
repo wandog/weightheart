@@ -30,24 +30,24 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
 #driver = webdriver.Chrome (chrome_options=options)
 driver=webdriver.Chrome("/usr/lib/chromium-browser/chromedriver",chrome_options=options)
+#driver=webdriver.Chrome("/usr/lib/chromium-browser/chromedriver")
 
 driver.get ( "http://localhost:5000/index" )
 
-#time.sleep(1)
+time.sleep(1)
 
-proc=zbar.Processor()
-proc.parse_config('enable')
-device='/dev/video3'
-proc.init(device)
+#proc=zbar.Processor()
+#proc.parse_config('enable')
+#device='/dev/video3'
+#proc.init(device)
 #proc.visible=True
 #################################
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('192.168.1.102', 54321))
+sock.connect(('192.168.1.117', 54321))
 
 lock=threading.Lock()
 
 ##################################
-
 ######################################
 
 #thread to run automation member check in
@@ -57,20 +57,27 @@ def automation():
     global driver
     while True:
         
-        try:
-            proc.process_one()
-        except:
-            print("qrcode reader error!")
-            continue
+        
+        #proc.process_one()
+            
+        fp=open("/dev/ttyACM0",'rb')
+        #while True:
+        fp.flush()
+        text=fp.read(5)
+        fp.close()
+                #break
 
-        for symbol in proc.results:
-            print 'decoded', symbol.type, 'symbol', '"%s"' %symbol.data
-            print symbol.data
+        print "text is "+text
+
+
+        #for symbol in proc.results:
+        #    print 'decoded', symbol.type, 'symbol', '"%s"' %symbol.data
+        #    print symbol.data
         
         driver.get ( "http://localhost:5000/index" )
         time.sleep(1)       
 
-        text=symbol.data
+        #text=symbol.data
 
         if (text[0] =="m") is not True:
             continue
@@ -176,14 +183,15 @@ def showBulletin():
         lock.release()
         
         #with ILock('gym'):
-        conn = sqlite3.connect('./web_flask/test.db',timeout=30.0)
-        print "Opened database successfully"
-        result=conn.execute("select content from bulletin where b_num=?",((count%3)+1,)).fetchone()
+        conn = sqlite3.connect('./web_flask/test.db',timeout=20.0)
+        with conn:
+            print "Opened database successfully"
+            result=conn.execute("select content from bulletin where b_num=?",((count%3)+1,)).fetchone()
         
-        print result[0]
-        msg=result[0]
-        print msg
-        conn.close()
+            print result[0]
+            msg=result[0]
+            print msg
+        #conn.close()
         count=count+1
         time.sleep(10)
         

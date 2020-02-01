@@ -12,7 +12,8 @@ else
 	echo "video4 has been generated"
 fi
 
-ffmpeg -f video4linux2 -s 320x240 -i /dev/video4 -codec copy -f v4l2 /dev/video2  -codec copy -f v4l2 /dev/video3 >/dev/null 2>&1&
+#ffmpeg -f video4linux2 -s 320x240 -i /dev/video4 -codec copy -f v4l2 /dev/video2  -codec copy -f v4l2 /dev/video3 >/dev/null 2>&1&
+ffmpeg -f video4linux2 -s 320x240 -i /dev/video4 -codec copy -f v4l2 /dev/video2 >/dev/null 2>&1&
 
 exit 0
 

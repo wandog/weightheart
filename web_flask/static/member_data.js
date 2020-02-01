@@ -180,6 +180,10 @@ $("#savepic").click(function(){
     canvas.width=video.videoWidth;
     canvas.height=video.videoHeight;
     context.drawImage(video,0,0,video.videoWidth,video.videoHeight);
+    //canvas.width=320;
+    //canvas.height=240;
+    //context.drawImage(video,0,0,320,240);
+
 
     $("#video")[0].style.display="none";
     $("#CancelSavePic")[0].style.display="none";

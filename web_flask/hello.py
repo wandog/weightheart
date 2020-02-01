@@ -36,12 +36,12 @@ def convert_and_save(b64_string,filename):
 
 def get_db():
     # global dbq
-    # db = getattr(g, '_database', None)
-    # if db is None:
-    db = sqlite3.connect('test.db')
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = sqlite3.connect('test.db',timeout=10.0)
         # Enable foreign key check
-    db.execute("PRAGMA foreign_keys = ON")
-    return db
+        db.execute("PRAGMA foreign_keys = ON")
+        return db
 
 
 # @app.teardown_appcontext
@@ -308,7 +308,7 @@ def memeberGetInTimes():
     with db:
         result=db.execute("select * from members where id=?",(memberid, )).fetchone()
         if result:
-            quotaminus=checkQuotaNMinus(memberid)
+            quotaminus=checkQuotaNMinus(memberid,db)
             if quotaminus==-1:
                 return "此會員儲值次數為0 須加值"
             else:
@@ -452,9 +452,9 @@ def updateStaff():
 
 
 
-def checkQuotaNMinus(id):
-    db=get_db()
-    with db:
+def checkQuotaNMinus(id,db):
+    
+    
         # print("today is %s"%(today),file=sys.stderr)
         result=db.execute("select quota from members where id=? and quota>0 ",(id,)).fetchone()
         
