@@ -85,7 +85,9 @@ def automation():
         driver.find_element_by_id("memberID").clear()
         driver.find_element_by_id("memberID").send_keys(text)
         time.sleep(0.5)
-        
+        print "input data is "+text     
+        continue
+
         click_able=driver.find_element_by_id("btnGetIn")
 
         if click_able.is_enabled()==True:
