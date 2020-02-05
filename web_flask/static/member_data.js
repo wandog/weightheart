@@ -86,7 +86,7 @@ function calPrice_1(){
     }else if(membertype=="tran_little"){
         if(Times_1=="1"){
             price=320;
-        }else if(Times_1=="20"){
+        }else if(Times_1=="10"){
             price=2800;
         }else if(Times_1=="30"){
             price=7200;
