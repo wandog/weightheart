@@ -1,5 +1,143 @@
+//小班計次會員打卡
+$("#btnCourseLimitGetInTimes").click (function (){
 
-//年費會員打卡
+    if($("#memberID")[0].value==""){
+        alert("請輸入會員ID");
+        return;
+    }
+
+    var r = confirm("確定要扣除次數嗎?");
+    if(r==false){
+        return;
+    }
+    var memberid={
+        id:$("#memberID")[0].value,
+        date:$("#presentDate")[0].value
+    }
+    $.ajax({
+        type:"POST",
+        url:"/CourseLimitGetInTimes",
+        contentType: 'application/json;charset=UTF-8',
+        data:JSON.stringify(memberid),
+        error:function(result){
+            // alert(result);
+            alert("儲值次數扣除失敗!");
+        },
+        success:function(result){
+            // alert(result);
+            $("#response_1")[0].innerHTML=result;
+            loadMemberPhoto();
+            $("#showMsg").click();
+        }
+
+    });
+});
+
+
+
+
+//小班計次會員打卡
+$("#btnCourseGetInTimes").click (function (){
+
+    if($("#memberID")[0].value==""){
+        alert("請輸入會員ID");
+        return;
+    }
+
+    var r = confirm("確定要扣除次數嗎?");
+    if(r==false){
+        return;
+    }
+    var memberid={
+        id:$("#memberID")[0].value,
+        // date:$("#presentDate")[0].value
+    }
+    $.ajax({
+        type:"POST",
+        url:"/CourseGetInTimes",
+        contentType: 'application/json;charset=UTF-8',
+        data:JSON.stringify(memberid),
+        error:function(result){
+            // alert(result);
+            alert("儲值次數扣除失敗!");
+        },
+        success:function(result){
+            // alert(result);
+            $("#response_1")[0].innerHTML=result;
+            loadMemberPhoto();
+            $("#showMsg").click();
+        }
+
+    });
+});
+
+//小班計次會員打卡
+$("#btnTranLittleGetInTimes").click (function (){
+
+    if($("#memberID")[0].value==""){
+        alert("請輸入會員ID");
+        return;
+    }
+
+    var r = confirm("確定要扣除次數嗎?");
+    if(r==false){
+        return;
+    }
+    var memberid={
+        id:$("#memberID")[0].value,
+        // date:$("#presentDate")[0].value
+    }
+    $.ajax({
+        type:"POST",
+        url:"/TranLittleGetInTimes",
+        contentType: 'application/json;charset=UTF-8',
+        data:JSON.stringify(memberid),
+        error:function(result){
+            // alert(result);
+            alert("儲值次數扣除失敗!");
+        },
+        success:function(result){
+            // alert(result);
+            $("#response_1")[0].innerHTML=result;
+            loadMemberPhoto();
+            $("#showMsg").click();
+        }
+
+    });
+});
+
+//小班月費會員打卡
+$("#btnVIPGetIn").click (function (){
+
+    if($("#memberID")[0].value==""){
+        alert("請輸入會員ID");
+        return;
+    }
+    var memberid={
+        id:$("#memberID")[0].value,
+        date:$("#presentDate")[0].value
+    }
+    $.ajax({
+        type:"POST",
+        url:"/vipGetIn",
+        contentType: 'application/json;charset=UTF-8',
+        data:JSON.stringify(memberid),
+        error:function(result){
+            // alert(result);
+            alert("打卡失敗!");
+        },
+        success:function(result){
+            // alert(result);
+            $("#response_1")[0].innerHTML=result;
+            loadMemberPhoto();
+            $("#showMsg").click();
+        }
+
+    });
+});
+
+
+//自主月費會員打卡
 $("#btnGetIn").click (function (){
 
     if($("#memberID")[0].value==""){
@@ -29,7 +167,7 @@ $("#btnGetIn").click (function (){
     });
 });
 
-//儲次會員打卡
+//自主計次會員打卡
 $("#btnGetInTimes").click (function (){
 
     if($("#memberID")[0].value==""){
@@ -71,6 +209,11 @@ $(document).ready(function(){
     $("#btnGetIn").attr("disabled",true);
     $("#btnGetInTimes").attr("disabled",true);
 
+    $("#btnVIPGetIn").attr("disabled",true);
+    $("#btnTranLittleGetInTimes").attr("disabled",true);
+    $("#btnCourseLimitGetInTimes").attr("disabled",true);
+    $("#btnCourseGetInTimes").attr("disabled",true);
+
     MemberIDinput = document.getElementById('memberID');
     MemberIDinput.addEventListener('input', detect_exist);
     
@@ -82,6 +225,7 @@ $(document).ready(function(){
 
     $("#memberID_add")[0].disabled=true;
     var t=setInterval(getTimenDate,1000);
+    // var t=setTimeout(getTimenDate,1000);
 
 });
 
@@ -181,13 +325,21 @@ function detect_exist(e){
                 $("#memberGetInRec").attr("disabled",false);
                 $("#btnGetIn").attr("disabled",false);
                 $("#btnGetInTimes").attr("disabled",false);
-                
+                $("#btnVIPGetIn").attr("disabled",false);
+                $("#btnTranLittleGetInTimes").attr("disabled",false);
+                $("#btnCourseLimitGetInTimes").attr("disabled",false);
+                $("#btnCourseGetInTimes").attr("disabled",false);
                 
             }else{
                 $("#memberQuery").attr("disabled", true);
                 $("#memberGetInRec").attr("disabled",true);
                 $("#btnGetIn").attr("disabled",true);
                 $("#btnGetInTimes").attr("disabled",true);
+
+                $("#btnVIPGetIn").attr("disabled",true);
+                $("#btnTranLittleGetInTimes").attr("disabled",true);
+                $("#btnCourseLimitGetInTimes").attr("disabled",true);
+                $("#btnCourseGetInTimes").attr("disabled",true);
             }
         },
         error:function(result){ 

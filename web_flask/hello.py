@@ -113,42 +113,88 @@ def save_trans():
     staffid=request.json['staffid']
     startdate=request.json['startdate']
     price=request.json['price']
+    membertype=request.json['membertype']
+    quotaadded=request.json['quotaadded']
+    enddate=request.json['enddate']      
     db=get_db()
     with db:
-        try:    #計次
-            quotaadded=request.json['quotaadded']      
-        except: #present 年費
-            enddate=request.json['enddate']
-            db.execute("insert into trans (memberid, staffid, startdate,price,enddate) values(?,?,?,?,?)",(memberid,staffid,startdate,price,enddate))
-            db.commit()
 
-            return "年費型合約成立!"
-        else:
-            db.execute("insert into trans (memberid, staffid, startdate, price) values(?,?,?,?)",(memberid,staffid,startdate,price))
+        if(membertype=="times"):    #自主計次 enddate not needed, quota needed
+            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
             db.commit()
             db.execute("update members set quota=quota+? where id=?",(quotaadded,memberid))    
             db.commit()
             result=db.execute('select quota from members where id=?',(memberid,)).fetchone()
             if result:
-                return "計次加值成功 剩餘次數為"+str(result[0])
+                return "自主計次加值成功 剩餘次數為"+str(result[0])
             else:
-                return "次數加值出了問題"
+                return "自主次數加值出了問題"
+
+        elif(membertype=="normal"):  #自主年費 enddate neeeded, quota not needed
+            # enddate=request.json['enddate']
+            db.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(?,?,?,?,?,?)",(memberid,staffid,startdate,price,enddate,membertype))
+            db.commit()
+            return "自主年費型合約成立!"
+
+        elif(membertype=="vip"):   #小班月費 enddate needed, quota not needed
+            db.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(?,?,?,?,?,?)",(memberid,staffid,startdate,price,enddate,membertype))
+            db.commit()
+            return "小班月費合約成立!"
+        elif(membertype=="tran_little"):    #小班計次 enddate not needed, quota needed    
+            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+            db.commit()
+            db.execute("update members set quota_tran_little=quota_tran_little+? where id=?",(quotaadded,memberid))    
+            db.commit()
+            result=db.execute('select quota_tran_little from members where id=?',(memberid,)).fetchone()
+            if result:
+                return "小班計次加值成功 剩餘次數為"+str(result[0])
+            else:
+                return "小班計次加值加值出了問題"
+
+
+        elif(membertype=="course_limit"):  #enddate and quota both needed
+            db.execute("insert into trans (memberid, staffid, startdate, price, membertype, enddate, quota_course_limit) values(?,?,?,?,?,?,?)",(memberid,staffid,startdate,price,membertype,enddate,quotaadded))
+            db.commit()
+            # db.execute("update members set quota_course_limit=quota_course_limit+? where id=?",(quotaadded,memberid))    
+            # db.commit()
+            result=db.execute('select quota_course_limit from trans where memberid=? order by startdate desc',(memberid,)).fetchone()
+            if result:
+                return "有限期教練課加值成功 儲值次數為"+str(result[0])
+            else:
+                return "有限期教練課加值加值出了問題"
+        elif(membertype=="course"): #endate not needed, quota needed
+            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+            db.commit()
+            db.execute("update members set quota_course=quota_course+? where id=?",(quotaadded,memberid))    
+            db.commit()
+            result=db.execute('select quota_course from members where id=?',(memberid,)).fetchone()
+            if result:
+                return "無限期教練課加值成功 剩餘次數為"+str(result[0])
+            else:
+                return "無限期教練課加值加值出了問題"
+        else:
+            return "繳費系統錯誤"
+        
+        # try:    #計次
+        #     quotaadded=request.json['quotaadded']      
+        # except: #present 年費
+        #     enddate=request.json['enddate']
+        #     db.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(?,?,?,?,?,?)",(memberid,staffid,startdate,price,enddate,membertype))
+        #     db.commit()
+
+        #     return "年費型合約成立!"
+        # else:
+        #     db.execute("insert into trans (memberid, staffid, startdate, price,membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+        #     db.commit()
+        #     db.execute("update members set quota=quota+? where id=?",(quotaadded,memberid))    
+        #     db.commit()
+        #     result=db.execute('select quota from members where id=?',(memberid,)).fetchone()
+        #     if result:
+        #         return "計次加值成功 剩餘次數為"+str(result[0])
+        #     else:
+        #         return "次數加值出了問題"
     
-    # members_1=[]
-    # for row in c:
-    #     members_1.append({
-    #         'id':row[0],
-    #         'name':row[1]
-    #     })
     
-    # print(members_1,file=sys.stderr)    
-    # return render_template('db_test.html',members=members_1)
-
-
-# @app.route("/")
-# def hello():
-#     return render_template('base.html')    
-
 
 
 
@@ -222,7 +268,7 @@ def getTransRec():
     memberid=request.json['id']
     db=get_db()
     with db:
-        result=db.execute('select transid, startdate,enddate,price,staffid, name, timestamp from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',
+        result=db.execute('select transid, startdate,enddate,price,staffid, name, timestamp, membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',
         (memberid, )).fetchall()
         return jsonify(result)
 
@@ -238,8 +284,13 @@ def member():
             with db:
                 result=db.execute("select name,birth,type,phone,agent_name,agent_phone,agent_relation,address,nationID from members where id=?",(memberid,)).fetchone()
                 # result=db.execute("select name from members where id=?",(memberid,)).fetchone()
-                result_1=db.execute('select transid, startdate,price,staffid, name, timestamp,enddate from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',(memberid, )).fetchall()
+                result_1=db.execute('select transid, startdate,price,staffid, name, timestamp,enddate,membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',(memberid, )).fetchall()
                 result_2=db.execute('select id,name from staff').fetchall()
+
+                # for x in range(len(result_1)):
+                #     for y in range(8):
+                #         if result_1[x][y]=="normal":
+                #             result_1[x][y]="自主月費"
 
                 resp =make_response(render_template('member_data.html',topbar="會員資料",
                 memberid=memberid,name=result[0],birth_1=result[1],phone=result[3],
@@ -295,29 +346,221 @@ def employee():
         else:
             return "錯誤"
 
-# for 儲次型入場
+# for 自主計次型入場
 @app.route("/memberGetInTimes",methods=['GET','POST'])
 def memeberGetInTimes():
     memberid=request.json['id']
     # today=request.json['date']
     print("id is %s"%(memberid),file=sys.stderr)
-    # db=get_db()
-    # result=db.execute("select * from members where id=?",(memberid, )).fetchone()
-    # if result:
+    
     db=get_db()
     with db:
         result=db.execute("select * from members where id=?",(memberid, )).fetchone()
         if result:
-            quotaminus=checkQuotaNMinus(memberid,db)
+            quotaminus=checkQuotaNMinus(memberid,db,"times")
             if quotaminus==-1:
-                return "此會員儲值次數為0 須加值"
+                return "此會員自主計次次數為0 須加值"
             else:
-                db.execute("insert into membergetinlog (memberid, quota) values (?,?)",(memberid,quotaminus))
+                db.execute("insert into membergetinlog (memberid, quota,membertype) values (?,?,?)",(memberid,quotaminus,"times"))
                 db.commit()
-                return "此會員儲值次數扣點後為"+str(quotaminus)
+                return "此會員自主計次儲值次數扣點後為"+str(quotaminus)
             
         else:
             return "沒有此會員"
+
+
+# for 小班計次型入場
+@app.route("/TranLittleGetInTimes",methods=['GET','POST'])
+def TranLittleGetInTimes():
+    memberid=request.json['id']
+    # today=request.json['date']
+    print("id is %s"%(memberid),file=sys.stderr)
+    
+    db=get_db()
+    with db:
+        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        if result:
+            quotaminus=checkQuotaNMinus(memberid,db,"tran_little")
+            if quotaminus==-1:
+                return "此會員小班計次儲值次數為0 須加值"
+            else:
+                db.execute("insert into membergetinlog (memberid, quota, membertype) values (?,?,?)",(memberid,quotaminus,"tran_little"))
+                db.commit()
+                return "此會員小班計次儲值次數扣點後為"+str(quotaminus)
+            
+        else:
+            return "沒有此會員"
+
+
+# for 無限期教練課入場
+@app.route("/CourseGetInTimes",methods=['GET','POST'])
+def CourseGetInTimes():
+    memberid=request.json['id']
+    # today=request.json['date']
+    print("id is %s"%(memberid),file=sys.stderr)
+    
+    db=get_db()
+    with db:
+        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        if result:
+            quotaminus=checkQuotaNMinus(memberid,db,"course")
+            if quotaminus==-1:
+                return "此會員無限期教練課計次儲值次數為0 須加值"
+            else:
+                db.execute("insert into membergetinlog (memberid, quota,membertype) values (?,?,?)",(memberid,quotaminus,"course"))
+                db.commit()
+                return "此會員無限期教練課計次儲值次數扣點後為"+str(quotaminus)
+            
+        else:
+            return "沒有此會員"
+
+
+# for 有限期教練課入場
+@app.route("/CourseLimitGetInTimes",methods=['GET','POST'])
+def CourseLimitGetInTimes():
+    memberid=request.json['id']
+    today=request.json['date']
+    membertype="course_limit"
+    print("id is %s"%(memberid),file=sys.stderr)
+    print("get in course limit",file=sys.stderr)
+    db=get_db()
+    with db:
+        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        if result:
+            value_ret=checkifmemberValid_course_limit(result[0],today,db)
+            if(value_ret[0]==0):
+                # db.execute("insert into membergetinlog (memberid) values (?)",(memberid,))
+                # db.commit()
+                startdate=value_ret[1]
+                enddate=value_ret[2]
+                quotaminus=checkQuotaNMinus_course_limit(memberid,str(startdate),str(enddate),db)
+                # return quotaminus
+                if quotaminus==-1:
+                    return "此會員限期教練課計次儲值次數為0 須加值"
+                else:
+                    db.execute("insert into membergetinlog (memberid, quota, membertype) values (?,?,?)",(memberid,quotaminus,"course_limit"))
+                    db.commit()
+                    
+                    return "此會員限期教練課計次儲值次數扣點後為"+str(quotaminus)
+
+                # return "此會員有有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
+            elif(value_ret[0]==-1):    
+                return "此會員限期教練課無有效會籍,最近有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
+            else:
+                return "此會員沒有購買限期教練課合約"
+        else:
+            return "沒有此會員"
+
+def checkifmemberValid_course_limit(id_1, today, db):
+    type_1="course_limit"
+    result=db.execute('select startdate,enddate from trans where memberid=? and membertype="course_limit" and startdate is not null and quota_course_limit is not 0 order by startdate desc',(id_1,)).fetchall()
+    if result:
+
+        today=today.split("-")
+        today=date(int(today[0]),int(today[1]),int(today[2]))
+        test_result=False
+        for row in result:
+            startdate=row[0]
+            startdate=startdate.split("-")
+            startdate=date(int(startdate[0]),int(startdate[1]),int(startdate[2]))
+
+            enddate=row[1]
+            enddate=enddate.split("-")
+            enddate=date(int(enddate[0]),int(enddate[1]),int(enddate[2]))
+
+            temp_1=(today-startdate)
+            temp_2=(enddate-today)
+            print("temp_1 is %s temp_2 is %s"%(str(temp_1),str(temp_2)),file=sys.stderr)
+            if (str(temp_1).find("-")==-1 and str(temp_2).find("-")==-1):
+                test_result=test_result or True
+                print("test_result is %s"%test_result,file=sys.stderr)
+            if(test_result==True):  #once got the valid time range then break out
+                break 
+        
+        if(test_result==True):
+            return [0, startdate, enddate]
+        else:
+            return [-1, startdate, enddate]
+    else:
+        return [-2, -1, -1]
+
+def checkQuotaNMinus_course_limit(memberid,startdate,enddate,db):
+    print("temp_1 is %s temp_2 is %s"%(startdate,enddate),file=sys.stderr)
+    
+
+    result=db.execute("select quota_course_limit from trans where startdate=? and enddate=? and memberid=? and membertype='course_limit'",(startdate,enddate,memberid,)).fetchone()
+    
+    if result[0]<=0:
+        return -1
+    else:
+        db.execute("update trans set quota_course_limit=? where startdate=? and enddate=? and memberid=? and membertype='course_limit'",(int(result[0])-1,startdate,enddate,memberid))
+        db.commit()
+        return int(result[0])-1
+
+
+
+# def checkQuotaNMinus(id,db,membertype):
+
+#         if(membertype=="times"):
+#             point="quota"
+#         elif(membertype=="course"):
+#             point="quota_course"
+#         elif(membertype=="tran_little"):
+#             point="quota_tran_little"
+#         # elif (membertype=="course_limit"):
+#         #     point="quota_course_limit"    
+#         # print("today is %s"%(today),file=sys.stderr)
+#         result=db.execute("select "+point+" from members where id=? and "+point+">0 ",(id,)).fetchone()
+        
+#         if result:
+#             db.execute("update members set "+point+"=? where id=?",(int(result[0])-1,id))
+#             db.commit()
+#             return int(result[0])-1
+#         else:
+#             return -1
+
+
+
+
+# def checkifmemberValid(id_1,today,membertype,db):
+    
+#     result=db.execute("select startdate,enddate from trans where memberid=? and membertype=? and enddate is not null order by enddate asc",(id_1,membertype,)).fetchall()
+    
+#     if result:
+
+#         today=today.split("-")
+#         today=date(int(today[0]),int(today[1]),int(today[2]))
+#         test_result=False
+#         for row in result:
+#             startdate=row[0]
+#             startdate=startdate.split("-")
+#             startdate=date(int(startdate[0]),int(startdate[1]),int(startdate[2]))
+
+#             enddate=row[1]
+#             enddate=enddate.split("-")
+#             enddate=date(int(enddate[0]),int(enddate[1]),int(enddate[2]))
+
+#             temp_1=(today-startdate)
+#             temp_2=(enddate-today)
+#             print("temp_1 is %s temp_2 is %s"%(str(temp_1),str(temp_2)),file=sys.stderr)
+#             if (str(temp_1).find("-")==-1 and str(temp_2).find("-")==-1):
+#                 test_result=test_result or True
+#             if(test_result==True):
+#                 break 
+#             print("test_result is %s"%test_result,file=sys.stderr)
+
+#         if(test_result==True):
+#             return [0, startdate, enddate]
+#         else:
+#             return [-1, startdate, enddate]
+#     else:
+#         return [-2, -1, -1]
+
+
+
+
+
+
     
 # 用電話查會員號碼
 @app.route('/id_querybyPhone', methods =[ 'GET' , 'POST' ])
@@ -333,35 +576,59 @@ def id_querybyPhone():
             return "查無資料"
 
 
-# for 會費型入場
+# for 自主月費會費型入場
 @app.route ( '/memberGetIn' , methods =[ 'GET' , 'POST' ])
 def memberGetIn ():
     
     memberid=request.json['id']
     today=request.json['date']
+    membertype="normal"
     print("id is %s"%(memberid),file=sys.stderr)
     db=get_db()
     with db:
         result=db.execute("select * from members where id=?",(memberid, )).fetchone()
         if result:
-            value_ret=checkifmemberValid(result[0],today)
+            value_ret=checkifmemberValid(result[0],today,membertype,db)
             if(value_ret[0]==0):
-                db.execute("insert into membergetinlog (memberid) values (?)",(memberid,))
+                db.execute("insert into membergetinlog (memberid,membertype) values (?,?)",(memberid,membertype,))
                 db.commit()
                 return "此會員有有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
             elif(value_ret[0]==-1):    
                 return "此會員無有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
             else:
-                return "此會員沒有購買年費合約"
+                return "此會員沒有購買自主月費合約"
         else:
             return "無此會員"
+
+
+# for 小班月費會費型入場
+@app.route ( '/vipGetIn' , methods =[ 'GET' , 'POST' ])
+def vipGetIn ():
     
-# def writeGetInLog(id_1, quota):
-#     db=get_db()
-#     # print("today is %s"%(today),file=sys.stderr)
-#     db.execute("insert into membergetinlog (memberid,quota) values (?,?)",(id_1,quota,))
-#     db.commit()
-#     return 0
+    memberid=request.json['id']
+    today=request.json['date']
+    membertype="vip"
+    print("id is %s"%(memberid),file=sys.stderr)
+    db=get_db()
+    with db:
+        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        if result:
+            value_ret=checkifmemberValid(result[0],today,membertype,db)
+            if(value_ret[0]==0):
+                db.execute("insert into membergetinlog (memberid,membertype) values (?,?)",(memberid,membertype,))
+                db.commit()
+                return "此會員有有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
+            elif(value_ret[0]==-1):    
+                return "此會員無有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
+            else:
+                return "此會員沒有購買小班月費合約"
+        else:
+            return "無此會員"
+
+
+
+    
+
 
 
 
@@ -452,116 +719,61 @@ def updateStaff():
 
 
 
-def checkQuotaNMinus(id,db):
-    
-    
+def checkQuotaNMinus(id,db,membertype):
+
+        if(membertype=="times"):
+            point="quota"
+        elif(membertype=="course"):
+            point="quota_course"
+        elif(membertype=="tran_little"):
+            point="quota_tran_little"
+        # elif (membertype=="course_limit"):
+        #     point="quota_course_limit"    
         # print("today is %s"%(today),file=sys.stderr)
-        result=db.execute("select quota from members where id=? and quota>0 ",(id,)).fetchone()
+        result=db.execute("select "+point+" from members where id=? and "+point+">0 ",(id,)).fetchone()
         
         if result:
-            db.execute("update members set quota=? where id=?",(int(result[0])-1,id))
+            db.execute("update members set "+point+"=? where id=?",(int(result[0])-1,id))
             db.commit()
             return int(result[0])-1
         else:
             return -1
 
-def checkifmemberValid(id,today):
-    db=get_db()
-    with db:
-        # print("today is %s"%(today),file=sys.stderr)
-        result=db.execute("select startdate,enddate from trans where memberid=? and enddate is not null order by enddate asc",(id,)).fetchall()
-        
-        if result:
+def checkifmemberValid(id_1,today,membertype,db):
+    
+    result=db.execute("select startdate,enddate from trans where memberid=? and membertype=? and enddate is not null order by enddate asc",(id_1,membertype,)).fetchall()
+    
+    if result:
 
-            today=today.split("-")
-            today=date(int(today[0]),int(today[1]),int(today[2]))
-            test_result=False
-            for row in result:
-                startdate=row[0]
-                startdate=startdate.split("-")
-                startdate=date(int(startdate[0]),int(startdate[1]),int(startdate[2]))
+        today=today.split("-")
+        today=date(int(today[0]),int(today[1]),int(today[2]))
+        test_result=False
+        for row in result:
+            startdate=row[0]
+            startdate=startdate.split("-")
+            startdate=date(int(startdate[0]),int(startdate[1]),int(startdate[2]))
 
-                enddate=row[1]
-                enddate=enddate.split("-")
-                enddate=date(int(enddate[0]),int(enddate[1]),int(enddate[2]))
+            enddate=row[1]
+            enddate=enddate.split("-")
+            enddate=date(int(enddate[0]),int(enddate[1]),int(enddate[2]))
 
-                temp_1=(today-startdate)
-                temp_2=(enddate-today)
-                print("temp_1 is %s temp_2 is %s"%(str(temp_1),str(temp_2)),file=sys.stderr)
-                if (str(temp_1).find("-")==-1 and str(temp_2).find("-")==-1):
-                    test_result=test_result or True; 
-                print("test_result is %s"%test_result,file=sys.stderr)
-
+            temp_1=(today-startdate)
+            temp_2=(enddate-today)
+            print("temp_1 is %s temp_2 is %s"%(str(temp_1),str(temp_2)),file=sys.stderr)
+            if (str(temp_1).find("-")==-1 and str(temp_2).find("-")==-1):
+                test_result=test_result or True
             if(test_result==True):
-                return [0, startdate, enddate]
-            else:
-                return [-1, startdate, enddate]
+                break 
+            print("test_result is %s"%test_result,file=sys.stderr)
+
+        if(test_result==True):
+            return [0, startdate, enddate]
         else:
-            return [-2, -1, -1]
+            return [-1, startdate, enddate]
+    else:
+        return [-2, -1, -1]
 
 
-
-# @app.route('/draw', methods=['POST','GET'])
-# def draw ():
-#     # global db
-#     db=get_db()
-#     group_name = request.form.get('group_name')
-#     valid_members_sql = 'SELECT id FROM members '
-#     cursor=db.cursor()
-#     if group_name == 'ALL':
-#         cursor.execute(valid_members_sql)
-#     else:
-#         valid_members_sql += 'WHERE group_name = ?'
-#         cursor.execute(valid_members_sql, (group_name, ))
-    
-#     gg=cursor.fetchall()
-#     # print(row, file=sys.stderr)
-#     # for row in gg:
-#     #     print(row[0],file=sys.stderr)
-#     # return str(row[0])
-
-
-#     valid_member_ids = [
-#         row[0] for row in gg
-#     ]
-
-#     # print(valid_member_ids,file=sys.stderr)
-
-#     if not valid_member_ids:
-#         err_msg = "<p>No members in group '%s'</p>" % group_name
-#         return err_msg, 404
-    
-#     lucky_member_id = random.choice(valid_member_ids)
-
-
-#     member_name, member_group_name = db.execute(
-#         'SELECT name, group_name FROM members WHERE id = ?',
-#         (lucky_member_id, )
-#     ).fetchone()
-
-#     with db:
-#         db.execute('INSERT INTO draw_histories (memberid) VALUES (?)',(lucky_member_id, ))
-
-    
-    
-    
-#     return '<p>%s（團體：%s）</p>' % (member_name.encode("utf-8"), member_group_name.encode("utf-8"))
-    # return "pp"
-
-# @app.route('/history')
-# def history():
-#     db = get_db()
-#     recent_histories = db.execute(
-#         'SELECT m.name, m.group_name, d.time '
-#         'FROM draw_histories AS d, members as m '
-#         'WHERE m.id == d.memberid '
-#         'ORDER BY d.time DESC '
-#         'LIMIT 10'
-#     ).fetchall()
-#     return render_template(
-#         'history.html',
-#         recent_histories=recent_histories
-#     )
 
 
 if __name__ == "__main__":

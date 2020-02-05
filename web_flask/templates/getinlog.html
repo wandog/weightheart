@@ -58,19 +58,47 @@ table.blueTable tfoot .links a{
 <h1>{{logexist}}</h1>
 <hr>
 <table class="blueTable">
-<tr><th>紀錄序號</th><th>會員編號</th><th>剩餘儲值次數</th><th>入場時間</th></tr>
+<tr><th>紀錄序號</th><th>會員編號</th><th>剩餘儲值次數</th>
+    <th>入場時間</th><th>入場型態</th></tr>
 {% for log in result%}
 <tr>
     <td>{{log.0}}</td>
     <td>{{log.1}}</td>
     <td>{{log.2}}</td>
     <td>{{log.3}}</td>
+    <td>{{log.4}}</td>
 </tr>
 {%endfor%}
 </table>
 <hr>
 
+<script>
+$(document).ready(function(){
+    
+    change_membertype2Chinese();
+});
 
+function change_membertype2Chinese(){
+    $('td').html(function(i, html){
+        return html.replace(/normal/g, '自主月費'); 
+      });
+    $('td').html(function(i, html){
+        return html.replace(/times/g, '自主計次'); 
+    });
+    $('td').html(function(i, html){
+        return html.replace(/vip/g, '小班月費'); 
+    });
+    $('td').html(function(i, html){
+        return html.replace(/tran_little/g, '小班計次'); 
+    });
+    $('td').html(function(i, html){
+        return html.replace(/course_limit/g, '限期教練課'); 
+    });
+    $('td').html(function(i, html){
+        return html.replace(/course/g, '無限期教練課'); 
+    });
+}
+</script>
 
 
 <!-- <script type="text/javascript" src="{{url_for('static',filename='custom.js')}}"></script> -->

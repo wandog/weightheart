@@ -44,7 +44,9 @@
     <th style="border:solid 2px;">繳費金額</th>
     <th style="border:solid 2px;">員工代碼</th>
     <th style="border:solid 2px;">員工名稱</th>
-    <th style="border:solid 2px;">時間戳記</th></tr>
+    <th style="border:solid 2px;">時間戳記</th>
+    <th style="border:solid 2px;">合約類別</th>  
+  </tr>
      
     {% for translog in trans %}
     <tr style="border:solid 2px;">
@@ -56,6 +58,7 @@
       <td>{{ translog.3 }}</td>
       <td>{{ translog.4 }}</td>
       <td>{{ translog.5 }}</td>
+      <td>{{ translog.7 }}</td>
     </tr>
     {% endfor %}
      <!-- <tr><td style="border:solid 2px;">2019-11-01</td><td style="border:solid 2px;">2020-11-01</td><td style="border:solid 2px;">1800</td><td style="border:solid 2px;">jorker</td><td style="border:solid 2px;">2019-11-1</td></tr> -->
@@ -65,31 +68,64 @@
 <h3>收費相關</h3> 
 <div><table><tr><td>
   <table id="priceTable" style="border:solid 2px;">
-   <tr><th>會員型態</th><th style="width:150px;text-align: center;">會期時間</th><th style="display:none;width:150px;text-align:center;">計次次數</th><th style="width:100px;">價格</th></tr>
+   <tr>
+    <th>會員型態</th>
+    <th style="width:150px;text-align: center;">會期時間</th>
+    <th style="display:none;width:150px;text-align: center;">計次次數</th>
+    <th style="display:none;width:150px;text-align: center;">會期時間</th>
+    <th style="display:none;width:150px;text-align: center;">計次次數</th>
+    <th style="display:none;width:150px;text-align: center;">堂數</th>
+    <th style="display:none;width:150px;text-align:center;">堂數</th>
+    <th style="width:100px;">價格</th></tr>
    <tr>
    <td>
-    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="vip"checked>VIP<br>
-    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="normal">一般<br>
-    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="times">計次
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="normal"checked>自主月費<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="times">自主計次<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="vip">小班月費<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="tran_little">小班計次<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="course_limit">限期一對一教練課<br>
+    <input onchange="hideCol();calPrice_1()" name="memberType" type="radio" value="course">無限期一對一教練課<br>
   </td>
   <td style="text-align: center;">
-      <input onchange="calPrice_1();" name="memberTime" type="radio" value="single" checked>單次<br>
-      <input onchange="calPrice_1();" name="memberTime" type="radio" value="month">單月<br>
+      <!-- <input onchange="calPrice_1();" name="memberTime" type="radio" value="single" checked>單次<br> -->
+      <input onchange="calPrice_1();" name="memberTime" type="radio" value="month" checked>單月<br>
       <input onchange="calPrice_1();" name="memberTime" type="radio" value="triple">三月<br>
       <input onchange="calPrice_1();" name="memberTime" type="radio" value="six">六月<br>
       <input onchange="calPrice_1();" name="memberTime" type="radio" value="oneyear">一年
   </td>
   <td style="display:none;text-align:center;">
-      <input onchange="calPrice_1();" name="Times" type="radio" value="10" checked>10<br>
-      <input onchange="calPrice_1();" name="Times" type="radio" value="20">20<br>
-      <input onchange="calPrice_1();" name="Times" type="radio" value="30">30<br>
-      <input onchange="calPrice_1();" name="Times" type="radio" value="50">50
+      <!-- <input onchange="calPrice_1();" name="Times" type="radio" value="10" checked>單次<br> -->
+      <input onchange="calPrice_1();" name="Times" type="radio" value="10" checked>10次<br>
+      <input onchange="calPrice_1();" name="Times" type="radio" value="30">30次<br>
+      <input onchange="calPrice_1();" name="Times" type="radio" value="50">50次
+    </td>
+    
+  <td style="display:none;text-align:center;">
+      <input onchange="calPrice_1();" name="memberMonths" type="radio" value="1" checked>01個月<br>
+      <input onchange="calPrice_1();" name="memberMonths" type="radio" value="3">03個月<br>
+      <input onchange="calPrice_1();" name="memberMonths" type="radio" value="6">06個月<br>
+      <input onchange="calPrice_1();" name="memberMonths" type="radio" value="12">12個月
   </td>
+  <td style="display:none;text-align:center;">
+      <input onchange="calPrice_1();" name="Times_1" type="radio" value="1" checked>01次<br>
+      <input onchange="calPrice_1();" name="Times_1" type="radio" value="10">10次<br>
+      <input onchange="calPrice_1();" name="Times_1" type="radio" value="30">30次<br>
+      <input onchange="calPrice_1();" name="Times_1" type="radio" value="50">50次
+    </td>
   
-      
-  
-  <td id="priceCharge">450<br>新台幣
-    <!-- <br><input type="text"> -->
+  <td style="display:none;text-align:center;">
+    <input onchange="calPrice_1();" name="CourseTimes" type="radio" value="5" checked>05堂(一個月)<br>
+    <input onchange="calPrice_1();" name="CourseTimes" type="radio" value="10">10堂(二個月)<br>
+    <input onchange="calPrice_1();" name="CourseTimes" type="radio" value="20">20堂(三個月)<br>
+    <input onchange="calPrice_1();" name="CourseTimes" type="radio" value="40">40堂(五個月)
+  </td>
+  <td style="display:none;text-align:center;">
+    <input onchange="calPrice_1();" name="CourseTimes_infi" type="radio" value="5" checked>05堂<br>
+    <input onchange="calPrice_1();" name="CourseTimes_infi" type="radio" value="10">10堂<br>
+    <input onchange="calPrice_1();" name="CourseTimes_infi" type="radio" value="20">20堂<br>
+    <input onchange="calPrice_1();" name="CourseTimes_infi" type="radio" value="40">40堂
+  </td>
+  <td id="priceCharge">150<br>新台幣
   </td>
   
   </tr> 

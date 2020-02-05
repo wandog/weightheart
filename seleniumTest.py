@@ -91,15 +91,12 @@ def automation():
         if click_able.is_enabled()==True:
             time.sleep(0.5)
             driver.find_element_by_id("btnGetIn").click()
-            print "btn is clickable"
+            print "btnGetIn is clicked"
         else:
             continue
 
         lock.acquire()
         print "lock acquire in automation"
-        
-        #time.sleep(6)
-        
         close_btn=driver.find_element_by_id("close_1")
         print "get dom of modal close btn"
         
@@ -153,6 +150,7 @@ def automation():
         elif "會籍" in response:
             #time.sleep(0.5)
             sock.send(response)
+            time.sleep(1)
         else:   #show bulletin
             print ("no expected response is saw!")
                 
@@ -177,11 +175,6 @@ def showBulletin():
     #print "Opened database successfully"
     
     while True:
-        #the msg should be read from db
-        lock.acquire() 
-        sock.send("bulletin"+msg)
-        lock.release()
-        
         #with ILock('gym'):
         conn = sqlite3.connect('./web_flask/test.db',timeout=20.0)
         with conn:
@@ -191,7 +184,14 @@ def showBulletin():
             print result[0]
             msg=result[0]
             print msg
-        #conn.close()
+        
+        
+        #the msg should be read from db
+        lock.acquire() 
+        sock.send("bulletin"+msg)
+        lock.release()
+        
+        
         count=count+1
         time.sleep(10)
         

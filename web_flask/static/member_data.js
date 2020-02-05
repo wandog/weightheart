@@ -2,20 +2,42 @@
 function hideCol() {
     // var membertype = document.getElementsByName("memberType")[0].value;
     var membertype=$("input[name='memberType']:checked").val();
-
-    if(membertype=="vip" || membertype=="normal"){
-        col=2;
+    var col="";
+    
+    if(membertype=="normal"){
+        col="2 3 4 5 6";
+    
     }else if(membertype=="times"){
-        col=1;
+        col="1 3 4 5 6";
+    
+    }else if(membertype=="vip"){
+        col="1 2 4 5 6";
+    
+    }else if(membertype=="tran_little"){
+        col="1 2 3 5 6";
+    
+    }else if(membertype=="course_limit"){
+        col="1 2 3 4 6";
+    
+    }else if(membertype=="course"){
+        col="1 2 3 4 5";
+    
     }
 
     var tbl = document.getElementById("priceTable");
     if (tbl != null) {
         for (var i = 0; i < tbl.rows.length; i++) {
             for (var j = 0; j < tbl.rows[i].cells.length; j++) {
-                tbl.rows[i].cells[j].style.display = "table-cell";
-                if (j == col)
+
+                
+                
+                if (col.indexOf(j.toString())!=-1){
                     tbl.rows[i].cells[j].style.display = "none";
+                }else{
+                    tbl.rows[i].cells[j].style.display = "table-cell";
+                }
+                
+                    
             }
         }
     }
@@ -26,42 +48,71 @@ function calPrice_1(){
     var membertype=$("input[name='memberType']:checked").val();
     var period=$("input[name='memberTime']:checked").val();
     var times=$("input[name='Times']:checked").val();
+    var memberMonths=$("input[name='memberMonths']:checked").val();
+    var Times_1=$("input[name='Times_1']:checked").val();
+    var CourseTimes=$("input[name='CourseTimes']:checked").val();
+    var CourseTimes_infi=$("input[name='CourseTimes_infi']:checked").val();
     var price=0;
     if(membertype=="normal"){
         if(period=="single"){
-            price=180;
+            price=150;
         }else if(period=="month"){
-            price=1200;
+            price=1300;
         }else if(period=="triple"){
-            price=3000;
+            price=3300;
         }else if(period=="six"){
-            price=4800;
+            price=5400;
         }else{
-            price=7200;
+            price=8400;
         }
     }else if(membertype=="vip"){
-        if(period=="single"){
-            price=450;
-        }else if(period=="month"){
-            price=3600;
-        }else if(period=="triple"){
-            price=9900;
-        }else if(period=="six"){
-            price=18000;
-        }else{
-            price=32400;
+        if(memberMonths=="1"){
+            price=3200;
+        }else if(memberMonths=="3"){
+            price=9000;
+        }else if(memberMonths=="6"){
+            price=16800;
+        }else if(memberMonths="12"){
+            price=31200;
         }
     }else if(membertype=="times"){
         if(times=="10"){
-            price=1300;
-        }else if(times=="20"){
-            price=2000;
+            price=1200;
         }else if(times=="30"){
-            price=2500;
-        }else{
             price=3000;
+        }else if(times=="50"){
+            price=4000;
         }
-        
+    }else if(membertype=="tran_little"){
+        if(Times_1=="1"){
+            price=320;
+        }else if(Times_1=="20"){
+            price=2800;
+        }else if(Times_1=="30"){
+            price=7200;
+        }else if(Times_1=="50"){
+            price=10000;
+        }
+    }else if(membertype=="course_limit"){
+        if(CourseTimes=="5"){
+            price=6500;
+        }else if(CourseTimes=="10"){
+            price=11000;
+        }else if(CourseTimes=="20"){
+            price=18000;
+        }else if(CourseTimes=="40"){
+            price=32000;
+        }
+    }else if(membertype=="course"){
+        if(CourseTimes_infi=="5"){
+            price=8000;
+        }else if(CourseTimes_infi=="10"){
+            price=14000;
+        }else if(CourseTimes_infi=="20"){
+            price=24000;
+        }else if(CourseTimes_infi=="40"){
+            price=40000;
+        }    
     }else{
         console.log("no price");
     }
@@ -81,6 +132,7 @@ $(document).ready(function(){
     $("#savepic")[0].style.display="none";
     disableAllData();
     $("#CancelSavePic")[0].style.display="none";
+    change_membertype2Chinese();
 });
 
 //load the photo of member
@@ -259,16 +311,19 @@ $("#h3memberID").click(function(){
 
 $("#confirmTrans").click(function(){
     var type=$('input[name ="memberType"]:checked').val();
-    var times=$('input[name ="Times"]:checked').val()       
+    var times=$('input[name ="Times"]:checked').val()   //for 自主計次       
+    var tranlittle_times=$('input[name ="Times_1"]:checked').val()   //for 小班訓練    
+    var course_times=$('input[name ="CourseTimes"]:checked').val()   //for 限期教練    
+    var courseinfini_times=$('input[name ="CourseTimes_infi"]:checked').val()   //for 無限期教練    
     var price_1=parseInt($("#priceCharge")[0].innerHTML.split("<br>")[0]);
 
     if($("#start_date")[0].value==""){
         alert("起始日不可為空!");
         return;
     }
-    if(type!="times"){
+    if(type=="normal"||type=="vip"||type=="course_limit"){
         if($("#end_date")[0].value==""){
-            alert("年費型到期日不可為空!");
+            alert("到期日不可為空!");
             return;
         }
     }
@@ -280,9 +335,10 @@ $("#confirmTrans").click(function(){
             memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
             staffid:$("#staffID").val(),
             startdate:$("#start_date")[0].value,
-            // enddate:null,
+            enddate:null,
             quotaadded:times,
             price:price_1,
+            membertype:"times"
         }
         $.ajax({
             type:"POST",
@@ -296,14 +352,107 @@ $("#confirmTrans").click(function(){
                 console.log(err);
             }
         });
-    }else{  //年費會員
+    }else if(type=="normal"){  //年費會員
         var data={
             memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
             staffid:$("#staffID").val(),
             startdate:$("#start_date")[0].value,
             enddate:$("#end_date")[0].value,
-            // quotaadded:0,
+            quotaadded:null,
             price:price_1,
+            membertype:"normal"
+        }
+        $.ajax({
+            type:"POST",
+            url:"/save_trans",
+            contentType: 'application/json;charset=UTF-8',
+            data:JSON.stringify(data),
+            success:function(result){
+                // console.log(result);
+                alert(result);
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }else if(type=="vip"){  //小班月費
+        var data={
+            memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
+            staffid:$("#staffID").val(),
+            startdate:$("#start_date")[0].value,
+            enddate:$("#end_date")[0].value,
+            quotaadded:null,
+            price:price_1,
+            membertype:"vip"
+        }
+        $.ajax({
+            type:"POST",
+            url:"/save_trans",
+            contentType: 'application/json;charset=UTF-8',
+            data:JSON.stringify(data),
+            success:function(result){
+                // console.log(result);
+                alert(result);
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }else if(type=="tran_little"){  //小班訓練
+        var data={
+            memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
+            staffid:$("#staffID").val(),
+            startdate:$("#start_date")[0].value,
+            enddate:null,
+            quotaadded:tranlittle_times,
+            price:price_1,
+            membertype:"tran_little"
+        }
+        $.ajax({
+            type:"POST",
+            url:"/save_trans",
+            contentType: 'application/json;charset=UTF-8',
+            data:JSON.stringify(data),
+            success:function(result){
+                // console.log(result);
+                alert(result);
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }else if(type=="course_limit"){  //限期教練
+        var data={
+            memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
+            staffid:$("#staffID").val(),
+            startdate:$("#start_date")[0].value,
+            enddate:$("#end_date")[0].value,
+            quotaadded:course_times,
+            price:price_1,
+            membertype:"course_limit"
+        }
+        $.ajax({
+            type:"POST",
+            url:"/save_trans",
+            contentType: 'application/json;charset=UTF-8',
+            data:JSON.stringify(data),
+            success:function(result){
+                // console.log(result);
+                alert(result);
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }else if(type=="course"){  //無限期教練
+        var data={
+            memberid:$("#h3memberID")[0].innerHTML.split("&nbsp;&nbsp;&nbsp;&nbsp;")[1],
+            staffid:$("#staffID").val(),
+            startdate:$("#start_date")[0].value,
+            enddate:null,
+            quotaadded:courseinfini_times,
+            price:price_1,
+            membertype:"course"
         }
         $.ajax({
             type:"POST",
@@ -322,6 +471,7 @@ $("#confirmTrans").click(function(){
 
     
     //clear all records
+    //暫時comment 方便開發
     $("#transRec").find("tr:gt(0)").remove();  
     
     var input={
@@ -335,8 +485,9 @@ $("#confirmTrans").click(function(){
         data:JSON.stringify(input),
         success:function(result){
             console.log(result);
-            var gg=result;    
+            // var gg=result;    
             show_trans_rec(result,'transRec');
+            change_membertype2Chinese();
         },
         error:function(err){
             console.log(err);
@@ -369,6 +520,27 @@ $("#saveNdisableEdit").click(function(){
     }
     
 });
+
+function change_membertype2Chinese(){
+    $('#transRec td').html(function(i, html){
+        return html.replace(/normal/g, '自主月費'); 
+      });
+    $('#transRec td').html(function(i, html){
+        return html.replace(/times/g, '自主計次'); 
+    });
+    $('#transRec td').html(function(i, html){
+        return html.replace(/vip/g, '小班月費'); 
+    });
+    $('#transRec td').html(function(i, html){
+        return html.replace(/tran_little/g, '小班計次'); 
+    });
+    $('#transRec td').html(function(i, html){
+        return html.replace(/course_limit/g, '限期教練課'); 
+    });
+    $('#transRec td').html(function(i, html){
+        return html.replace(/course/g, '無限期教練課'); 
+    });
+}
 
 
 function disableAllData(){
