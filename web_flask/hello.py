@@ -9,6 +9,12 @@ import sys,random
 import base64
 import pyqrcode
 from datetime import date
+import MySQLdb as mariadb
+
+
+
+
+
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -38,19 +44,14 @@ def get_db():
     # global dbq
     db = getattr(g, '_database', None)
     if db is None:
-        db = sqlite3.connect('test.db',timeout=10.0)
-        # Enable foreign key check
-        db.execute("PRAGMA foreign_keys = ON")
-        return db
+        #db = sqlite3.connect('test.db',timeout=10.0)
+        #db.execute("PRAGMA foreign_keys = ON")
+        #return db
 
-
-# @app.teardown_appcontext
-# def close_connection(exception):
-#     # global db
-#     db = getattr(g, '_database', None)
-#     if db is not None:
-#         db.close()
-
+        mariadb_connection = mariadb.connect(host='localhost',user='wandog', passwd='q0919155809', db='weightheart',charset="utf8")
+        return mariadb_connection
+        # cursor = mariadb_connection.cursor()
+        # return cursor
 
 
 @app.route("/show_qrcode",methods=['GET'])
@@ -84,7 +85,10 @@ def id_exist_check():
     # print(memberid,file=sys.stderr)
     db=get_db()
     with db:
-        result=db.execute("select id from members where id=?",(memberid,)).fetchall()
+        cursor=db.cursor()
+        cursor.execute("select id from members where id=%s",(memberid,))
+        # cursor.execute("select id from members where id='m0001'")
+        result=cursor.fetchall()
         # print(result,file=sys.stderr)
         if len(result) != 0:
             return "ok"
@@ -92,19 +96,29 @@ def id_exist_check():
             return "fail"
 
 
-@app.route("/staff_id_exist_check", methods = ['POST'])
-def staff_id_exist_check():
-    staffid=request.json['id'].lower()
-    # print(memberid,file=sys.stderr)
+# @app.route("/staff_id_exist_check", methods = ['POST'])
+# def staff_id_exist_check():
+#     staffid=request.json['id'].lower()
+#     # print(memberid,file=sys.stderr)
+#     db=get_db()
+#     with db:
+#         result=db.execute("select id from staff where id=?",(staffid,)).fetchall()
+#         # print(result,file=sys.stderr)
+#         if len(result) != 0:
+#             return "ok"
+#         else:
+#             return "fail"
+
+@app.route('/getTransRec', methods = ['GET', 'POST'])
+def getTransRec():
+    memberid=request.json['id']
     db=get_db()
     with db:
-        result=db.execute("select id from staff where id=?",(staffid,)).fetchall()
-        # print(result,file=sys.stderr)
-        if len(result) != 0:
-            return "ok"
-        else:
-            return "fail"
-
+        cursor=db.cursor()
+        cursor.execute('select transid, startdate,enddate,price,staffid, name, timestamp, membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=%s',
+        (memberid, ))
+        result=cursor.fetchall()
+        return jsonify(result)
 
 
 @app.route("/save_trans", methods = ['POST'])
@@ -118,13 +132,19 @@ def save_trans():
     enddate=request.json['enddate']      
     db=get_db()
     with db:
+        cursor=db.cursor()
 
         if(membertype=="times"):    #自主計次 enddate not needed, quota needed
-            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+
+            
+            cursor.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,membertype))
             db.commit()
-            db.execute("update members set quota=quota+? where id=?",(quotaadded,memberid))    
+            
+            cursor.execute("update members set quota=quota+%s where id=%s",(quotaadded,memberid))    
             db.commit()
-            result=db.execute('select quota from members where id=?',(memberid,)).fetchone()
+
+            cursor.execute('select quota from members where id=%s',(memberid,))
+            result=cursor.fetchone()
             if result:
                 return "自主計次加值成功 剩餘次數為"+str(result[0])
             else:
@@ -132,20 +152,21 @@ def save_trans():
 
         elif(membertype=="normal"):  #自主年費 enddate neeeded, quota not needed
             # enddate=request.json['enddate']
-            db.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(?,?,?,?,?,?)",(memberid,staffid,startdate,price,enddate,membertype))
+            cursor.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(%s,%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,enddate,membertype))
             db.commit()
             return "自主年費型合約成立!"
 
         elif(membertype=="vip"):   #小班月費 enddate needed, quota not needed
-            db.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(?,?,?,?,?,?)",(memberid,staffid,startdate,price,enddate,membertype))
+            cursor.execute("insert into trans (memberid, staffid, startdate,price,enddate,membertype) values(%s,%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,enddate,membertype))
             db.commit()
             return "小班月費合約成立!"
         elif(membertype=="tran_little"):    #小班計次 enddate not needed, quota needed    
-            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+            cursor.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,membertype))
             db.commit()
-            db.execute("update members set quota_tran_little=quota_tran_little+? where id=?",(quotaadded,memberid))    
+            cursor.execute("update members set quota_tran_little=quota_tran_little+%s where id=%s",(quotaadded,memberid))    
             db.commit()
-            result=db.execute('select quota_tran_little from members where id=?',(memberid,)).fetchone()
+            cursor.execute('select quota_tran_little from members where id=%s',(memberid,))
+            result=cursor.fetchone()
             if result:
                 return "小班計次加值成功 剩餘次數為"+str(result[0])
             else:
@@ -153,21 +174,25 @@ def save_trans():
 
 
         elif(membertype=="course_limit"):  #enddate and quota both needed
-            db.execute("insert into trans (memberid, staffid, startdate, price, membertype, enddate, quota_course_limit) values(?,?,?,?,?,?,?)",(memberid,staffid,startdate,price,membertype,enddate,quotaadded))
+            
+            cursor.execute("insert into trans (memberid, staffid, startdate, price, membertype, enddate, quota_course_limit) values(%s,%s,%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,membertype,enddate,quotaadded))
             db.commit()
             # db.execute("update members set quota_course_limit=quota_course_limit+? where id=?",(quotaadded,memberid))    
             # db.commit()
-            result=db.execute('select quota_course_limit from trans where memberid=? order by startdate desc',(memberid,)).fetchone()
+            
+            cursor.execute('select quota_course_limit from trans where memberid=%s order by startdate desc',(memberid,))
+            result=cursor.fetchone()
             if result:
                 return "有限期教練課加值成功 儲值次數為"+str(result[0])
             else:
                 return "有限期教練課加值加值出了問題"
         elif(membertype=="course"): #endate not needed, quota needed
-            db.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(?,?,?,?,?)",(memberid,staffid,startdate,price,membertype))
+            cursor.execute("insert into trans (memberid, staffid, startdate, price, membertype) values(%s,%s,%s,%s,%s)",(memberid,staffid,startdate,price,membertype))
             db.commit()
-            db.execute("update members set quota_course=quota_course+? where id=?",(quotaadded,memberid))    
+            cursor.execute("update members set quota_course=quota_course+%s where id=%s",(quotaadded,memberid))    
             db.commit()
-            result=db.execute('select quota_course from members where id=?',(memberid,)).fetchone()
+            cursor.execute('select quota_course from members where id=%s',(memberid,))
+            result=cursor.fetchone()
             if result:
                 return "無限期教練課加值成功 剩餘次數為"+str(result[0])
             else:
@@ -217,7 +242,9 @@ def bulletin():
     count=0
     db=get_db()
     with db:
-        result=db.execute("select content from bulletin").fetchall()
+        cursor=db.cursor()
+        cursor.execute("select content from bulletin")
+        result=cursor.fetchall()
         for row in result:
             msg[count]=row[0]
             count=count+1
@@ -234,9 +261,10 @@ def saveBulletin():
     
     db=get_db()
     with db:
-        db.execute("UPDATE bulletin SET content=? WHERE b_num=1",(bulletin0,))
-        db.execute("UPDATE bulletin SET content=? WHERE b_num=2",(bulletin1,))
-        db.execute("UPDATE bulletin SET content=? WHERE b_num=3",(bulletin2,))
+        cursor=db.cursor()
+        cursor.execute("UPDATE bulletin SET content=%s WHERE b_num=1",(bulletin0,))
+        cursor.execute("UPDATE bulletin SET content=%s WHERE b_num=2",(bulletin1,))
+        cursor.execute("UPDATE bulletin SET content=%s WHERE b_num=3",(bulletin2,))
         db.commit()
 
         # print("input is %s" %bulletin0,file=sys.stderr)
@@ -252,10 +280,13 @@ def getLastMemID():
     # print("target_1 is %s" %target_1,file=sys.stderr) 
     db=get_db()
     with db:
+        cursor=db.cursor()
         if target_1=="memberid":
-            result=db.execute("select id from members order by id desc limit 1").fetchone()
+            cursor.execute("select id from members order by id desc limit 1")
+            result=cursor.fetchone()
         elif target_1=="staffid":
-            result=db.execute("select id from staff order by id desc limit 1").fetchone()
+            cursor.execute("select id from staff order by id desc limit 1")
+            result=cursor.fetchone()
         else:
             return "something wrong!"
             # result=db.execute("select id from staff order by id desc limit 1").fetchone()
@@ -263,14 +294,16 @@ def getLastMemID():
         return result[0]
 
 
-@app.route('/getTransRec', methods = ['GET', 'POST'])
-def getTransRec():
-    memberid=request.json['id']
-    db=get_db()
-    with db:
-        result=db.execute('select transid, startdate,enddate,price,staffid, name, timestamp, membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',
-        (memberid, )).fetchall()
-        return jsonify(result)
+# @app.route('/getTransRec', methods = ['GET', 'POST'])
+# def getTransRec():
+#     memberid=request.json['id']
+#     db=get_db()
+#     with db:
+#         cursor=db.cursor()
+#         cursor.execute('select transid, startdate,enddate,price,staffid, name, timestamp, membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',
+#         (memberid, ))
+#         result=cursor.fetchall()
+#         return jsonify(result)
 
 # show the data of members
 @app.route('/member', methods = ['GET', 'POST'])
@@ -282,11 +315,16 @@ def member():
             # flash("Successful login", "success")
             db=get_db()
             with db:
-                result=db.execute("select name,birth,type,phone,agent_name,agent_phone,agent_relation,address,nationID from members where id=?",(memberid,)).fetchone()
+                cursor=db.cursor()
+                cursor.execute("select name,birth,type,phone,agent_name,agent_phone,agent_relation,address,nationID from members where id=%s",(memberid,))
+                result=cursor.fetchone()
                 # result=db.execute("select name from members where id=?",(memberid,)).fetchone()
-                result_1=db.execute('select transid, startdate,price,staffid, name, timestamp,enddate,membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=?',(memberid, )).fetchall()
-                result_2=db.execute('select id,name from staff').fetchall()
-
+                
+                cursor.execute('select transid, startdate,price,staffid, name, timestamp,enddate,membertype from trans cross join staff where trans.staffid=staff.id and trans.memberid=%s',(memberid, ))
+                result_1=cursor.fetchall()
+                
+                cursor.execute('select id,name from staff')
+                result_2=cursor.fetchall()
                 # for x in range(len(result_1)):
                 #     for y in range(8):
                 #         if result_1[x][y]=="normal":
@@ -300,7 +338,9 @@ def member():
         elif request.form['submit'] == 'queryGetInLog':
             db=get_db()
             with db:
-                result=db.execute("select * from membergetinlog where memberid=? order by timestamp desc",(memberid, )).fetchall()
+                cursor=db.cursor()
+                cursor.execute("select * from membergetinlog where memberid=%s order by timestamp desc",(memberid, ))
+                result=cursor.fetchall()
                 if result:
                     return render_template('getinlog.html', topbar="會員入場紀錄", memberid=memberid, result=result)
                 else:
@@ -319,11 +359,14 @@ def employee():
             # flash("Successful login", "success")
             db=get_db()
             with db:
-                result=db.execute("select name,birth,role,phone,agent_name,agent_phone,agent_relation,address,nationID from staff where id=?",(staffid,)).fetchone()
+                cursor=db.cursor()
+                cursor.execute("select name,birth,role,phone,agent_name,agent_phone,agent_relation,address,nationID from staff where id=%s",(staffid,))
+                result=cursor.fetchone()
                 if result:
                     pass
                 else:
-                    result=db.execute("select name,birth,role,phone,agent_name,agent_phone,agent_relation,address,nationID from staff where nationID=?",(nationid,)).fetchone()
+                    cursor.execute("select name,birth,role,phone,agent_name,agent_phone,agent_relation,address,nationID from staff where nationID=?",(nationid,))
+                    result=cursor.fetchone()
                 
                     if not result:
                         return "無此員工"    
@@ -355,13 +398,15 @@ def memeberGetInTimes():
     
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
         if result:
             quotaminus=checkQuotaNMinus(memberid,db,"times")
             if quotaminus==-1:
-                return "此會員自主計次次數為0 須加值"
+                return "此會員自主計次儲值次數為0 須加值"
             else:
-                db.execute("insert into membergetinlog (memberid, quota,membertype) values (?,?,?)",(memberid,quotaminus,"times"))
+                cursor.execute("insert into membergetinlog (memberid, quota,membertype) values (%s,%s,%s)",(memberid,quotaminus,"times"))
                 db.commit()
                 return "此會員自主計次儲值次數扣點後為"+str(quotaminus)
             
@@ -378,13 +423,15 @@ def TranLittleGetInTimes():
     
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
         if result:
             quotaminus=checkQuotaNMinus(memberid,db,"tran_little")
             if quotaminus==-1:
                 return "此會員小班計次儲值次數為0 須加值"
             else:
-                db.execute("insert into membergetinlog (memberid, quota, membertype) values (?,?,?)",(memberid,quotaminus,"tran_little"))
+                cursor.execute("insert into membergetinlog (memberid, quota, membertype) values (%s,%s,%s)",(memberid,quotaminus,"tran_little"))
                 db.commit()
                 return "此會員小班計次儲值次數扣點後為"+str(quotaminus)
             
@@ -401,13 +448,15 @@ def CourseGetInTimes():
     
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
         if result:
             quotaminus=checkQuotaNMinus(memberid,db,"course")
             if quotaminus==-1:
                 return "此會員無限期教練課計次儲值次數為0 須加值"
             else:
-                db.execute("insert into membergetinlog (memberid, quota,membertype) values (?,?,?)",(memberid,quotaminus,"course"))
+                cursor.execute("insert into membergetinlog (memberid, quota,membertype) values (%s,%s,%s)",(memberid,quotaminus,"course"))
                 db.commit()
                 return "此會員無限期教練課計次儲值次數扣點後為"+str(quotaminus)
             
@@ -425,7 +474,10 @@ def CourseLimitGetInTimes():
     print("get in course limit",file=sys.stderr)
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
+        
         if result:
             value_ret=checkifmemberValid_course_limit(result[0],today,db)
             if(value_ret[0]==0):
@@ -438,7 +490,7 @@ def CourseLimitGetInTimes():
                 if quotaminus==-1:
                     return "此會員限期教練課計次儲值次數為0 須加值"
                 else:
-                    db.execute("insert into membergetinlog (memberid, quota, membertype) values (?,?,?)",(memberid,quotaminus,"course_limit"))
+                    cursor.execute("insert into membergetinlog (memberid, quota, membertype) values (%s,%s,%s)",(memberid,quotaminus,"course_limit"))
                     db.commit()
                     
                     return "此會員限期教練課計次儲值次數扣點後為"+str(quotaminus)
@@ -453,7 +505,10 @@ def CourseLimitGetInTimes():
 
 def checkifmemberValid_course_limit(id_1, today, db):
     type_1="course_limit"
-    result=db.execute('select startdate,enddate from trans where memberid=? and membertype="course_limit" and startdate is not null and quota_course_limit is not 0 order by startdate desc',(id_1,)).fetchall()
+    cursor=db.cursor()
+    # cursor.execute('select startdate,enddate from trans where memberid=%s and membertype="course_limit" and startdate is not null and quota_course_limit is not 0 order by startdate desc',(id_1,))
+    cursor.execute('select startdate,enddate from trans where memberid=%s and membertype="course_limit" and (quota_course_limit != 0) order by startdate desc',(id_1,))
+    result=cursor.fetchall()
     if result:
 
         today=today.split("-")
@@ -487,13 +542,14 @@ def checkifmemberValid_course_limit(id_1, today, db):
 def checkQuotaNMinus_course_limit(memberid,startdate,enddate,db):
     print("temp_1 is %s temp_2 is %s"%(startdate,enddate),file=sys.stderr)
     
-
-    result=db.execute("select quota_course_limit from trans where startdate=? and enddate=? and memberid=? and membertype='course_limit'",(startdate,enddate,memberid,)).fetchone()
+    cursor=db.cursor()
+    cursor.execute("select quota_course_limit from trans where startdate=%s and enddate=%s and memberid=%s and membertype='course_limit'",(startdate,enddate,memberid,))
+    result=cursor.fetchone()
     
     if result[0]<=0:
         return -1
     else:
-        db.execute("update trans set quota_course_limit=? where startdate=? and enddate=? and memberid=? and membertype='course_limit'",(int(result[0])-1,startdate,enddate,memberid))
+        cursor.execute("update trans set quota_course_limit=%s where startdate=%s and enddate=%s and memberid=%s and membertype='course_limit'",(int(result[0])-1,startdate,enddate,memberid))
         db.commit()
         return int(result[0])-1
 
@@ -568,7 +624,9 @@ def id_querybyPhone():
     phone=request.json['phone']
     db=get_db()
     with db:
-        result=db.execute("select id from members where phone=?",(phone, )).fetchall()
+        cursor=db.cursor()
+        cursor.execute("select id from members where phone=%s",(phone, ))
+        result=cursor.fetchall()
 
         if result:
             return jsonify(result)
@@ -586,11 +644,14 @@ def memberGetIn ():
     print("id is %s"%(memberid),file=sys.stderr)
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
+
         if result:
             value_ret=checkifmemberValid(result[0],today,membertype,db)
             if(value_ret[0]==0):
-                db.execute("insert into membergetinlog (memberid,membertype) values (?,?)",(memberid,membertype,))
+                cursor.execute("insert into membergetinlog (memberid,membertype) values (%s,%s)",(memberid,membertype,))
                 db.commit()
                 return "此會員有有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
             elif(value_ret[0]==-1):    
@@ -611,11 +672,13 @@ def vipGetIn ():
     print("id is %s"%(memberid),file=sys.stderr)
     db=get_db()
     with db:
-        result=db.execute("select * from members where id=?",(memberid, )).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select * from members where id=%s",(memberid, ))
+        result=cursor.fetchone()
         if result:
             value_ret=checkifmemberValid(result[0],today,membertype,db)
             if(value_ret[0]==0):
-                db.execute("insert into membergetinlog (memberid,membertype) values (?,?)",(memberid,membertype,))
+                cursor.execute("insert into membergetinlog (memberid,membertype) values (%s,%s)",(memberid,membertype,))
                 db.commit()
                 return "此會員有有效會籍,有效日為"+str(value_ret[1])+'~'+str(value_ret[2])
             elif(value_ret[0]==-1):    
@@ -649,10 +712,14 @@ def saveNewMember():
 
     db=get_db()
     with db:
+        cursor=db.cursor()
         if savemember==True:    #add new member
-            db.execute("insert into members (id,name,birth,type,phone,agent_name,agent_phone,agent_relation,address,nationID) values(?,?,?,'normal',?,?,?,?,?,?)",(memberid,name,birth,phone,emerName,emerPhone,relation,address,nationid))
+            cursor.execute("insert into members (id,name,birth,type,phone,agent_name,agent_phone,agent_relation,address,nationID) values(%s,%s,%s,'normal',%s,%s,%s,%s,%s,%s)",(memberid,name,birth,phone,emerName,emerPhone,relation,address,nationid))
+            db.commit()
         elif savemember==False: #add new staff
-            db.execute("insert into staff (id,name,birth,phone,role,agent_name,agent_phone,agent_relation,address,nationID) values(?,?,?,?,'業務',?,?,?,?,?)",(memberid,name,birth,phone,emerName,emerPhone,relation,address,nationid))
+
+            cursor.execute("insert into staff (id,name,birth,phone,role,agent_name,agent_phone,agent_relation,address,nationID) values(%s,%s,%s,%s,'業務',%s,%s,%s,%s,%s)",(memberid,name,birth,phone,emerName,emerPhone,relation,address,nationid))
+            db.commit()
         else:
             return "abnormal status of savemember variable"
         
@@ -680,8 +747,9 @@ def updateMember():
     # print(memberid,file=sys.stderr)
     db=get_db()
     with db:
+        cursor=db.cursor()
         # result=db.execute("select id from members where id=?",(memberid,)).fetchall()    
-        db.execute("update members set name=?,birth=?,phone=?,agent_name=?,agent_phone=?,agent_relation=?,address=?,nationID=? where id=?",
+        cursor.execute("update members set name=%s,birth=%s,phone=%s,agent_name=%s,agent_phone=%s,agent_relation=%s,address=%s,nationID=%s where id=%s",
         (name,birth,phone,emerName,emerPhone,relation,address,nationid,memberid))
         db.commit()
         return "ok"
@@ -707,8 +775,9 @@ def updateStaff():
     # print(memberid,file=sys.stderr)
     db=get_db()
     with db:
+        cursor=db.cursor()
         # result=db.execute("select id from members where id=?",(memberid,)).fetchall()    
-        db.execute("update staff set name=?,birth=?,phone=?,agent_name=?,agent_phone=?,agent_relation=?,address=?,nationID=? where id=?",
+        cursor.execute("update staff set name=%s,birth=%s,phone=%s,agent_name=%s,agent_phone=%s,agent_relation=%s,address=%s,nationID=%s where id=%s",
         (name,birth,phone,emerName,emerPhone,relation,address,nationid,memberid))
         db.commit()
         return "ok"
@@ -730,18 +799,21 @@ def checkQuotaNMinus(id,db,membertype):
         # elif (membertype=="course_limit"):
         #     point="quota_course_limit"    
         # print("today is %s"%(today),file=sys.stderr)
-        result=db.execute("select "+point+" from members where id=? and "+point+">0 ",(id,)).fetchone()
+        cursor=db.cursor()
+        cursor.execute("select "+point+" from members where id=%s and "+point+">0 ",(id,))
+        result=cursor.fetchone()
         
         if result:
-            db.execute("update members set "+point+"=? where id=?",(int(result[0])-1,id))
+            cursor.execute("update members set "+point+"=%s where id=%s",(int(result[0])-1,id))
             db.commit()
             return int(result[0])-1
         else:
             return -1
 
 def checkifmemberValid(id_1,today,membertype,db):
-    
-    result=db.execute("select startdate,enddate from trans where memberid=? and membertype=? and enddate is not null order by enddate asc",(id_1,membertype,)).fetchall()
+    cursor=db.cursor()
+    cursor.execute("select startdate,enddate from trans where memberid=%s and membertype=%s and enddate is not null order by enddate asc",(id_1,membertype,))
+    result=cursor.fetchall()
     
     if result:
 
@@ -777,8 +849,8 @@ def checkifmemberValid(id_1,today,membertype,db):
 
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0',debug=True,ssl_context='adhoc')
-    app.run(host='0.0.0.0',debug=True)
+    app.run(host='0.0.0.0',debug=True,ssl_context=('/home/pi/test_code/web_flask/cert.pem', '/home/pi/test_code/web_flask/key.pem'))
+    # app.run(host='0.0.0.0',debug=True)
 
 
 

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Exec=lxqt-sudo /home/pi/test_code/end.sh
+Name=關閉管理程式
+Comment=close gym management system
+Encoding=UTF-8
+Terminal=false
+Type=Application
+Categories=Application;
+Icon=/home/pi/test_code/muscle_1.png
+

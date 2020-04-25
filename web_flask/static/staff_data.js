@@ -243,7 +243,7 @@ $("#h3memberID").click(function(){
             // alert(result);
             var host=window.location.host;
             // alert(host);
-            window.open('http://'+host+'/show_qrcode?id='+jj.memberID+"&name="+$("#name")[0].value,'會員QRCODE',
+            window.open('https://'+host+'/show_qrcode?id='+jj.memberID+"&name="+$("#name")[0].value,'會員QRCODE',
             'height=250,width=600,top=700,left=300,scrollbars=yes,resizable'
             );
         },

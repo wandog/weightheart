@@ -1,0 +1,220 @@
+-- MySQL dump 10.17  Distrib 10.3.17-MariaDB, for debian-linux-gnueabihf (armv7l)
+--
+-- Host: localhost    Database: weightheart
+-- ------------------------------------------------------
+-- Server version	10.3.17-MariaDB-0+deb10u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `bulletin`
+--
+
+DROP TABLE IF EXISTS `bulletin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bulletin` (
+  `b_num` tinyint(4) DEFAULT NULL,
+  `content` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bulletin`
+--
+
+LOCK TABLES `bulletin` WRITE;
+/*!40000 ALTER TABLE `bulletin` DISABLE KEYS */;
+INSERT INTO `bulletin` VALUES (1,'\n33重心健身房11\n\n測試測試測試測試測試\n       測試測試測試測試\n'),(2,'\n33安安11\n\n測試測試測試測試測試\n       測試測試測試測試'),(3,'\n33歡迎光臨11\n\n測試測試測試測試測試\n       測試測試測試測試');
+/*!40000 ALTER TABLE `bulletin` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `membergetinlog`
+--
+
+DROP TABLE IF EXISTS `membergetinlog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `membergetinlog` (
+  `getinid` int(11) NOT NULL AUTO_INCREMENT,
+  `memberid` varchar(5) DEFAULT NULL,
+  `quota` varchar(2) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `membertype` varchar(12) DEFAULT NULL,
+  PRIMARY KEY (`getinid`)
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `membergetinlog`
+--
+
+LOCK TABLES `membergetinlog` WRITE;
+/*!40000 ALTER TABLE `membergetinlog` DISABLE KEYS */;
+INSERT INTO `membergetinlog` VALUES (1,'m0001','3','2020-04-12 10:56:52','course_limit'),(2,'m0001','4','2020-04-13 02:58:24','course_limit'),(3,'m0001','9','2020-04-15 06:24:12','times'),(4,'m0001','8','2020-04-15 06:24:38','times'),(5,'m0001','7','2020-04-15 08:54:10','times'),(6,'m0001','6','2020-04-15 08:59:26','times'),(7,'m0001','5','2020-04-15 09:03:12','times'),(8,'m0001','4','2020-04-15 09:03:44','times'),(9,'m0001','3','2020-04-15 09:04:14','times'),(10,'m0001','2','2020-04-15 09:04:50','times'),(11,'m0001','1','2020-04-15 09:05:12','times'),(12,'m0001','0','2020-04-15 09:05:39','times'),(13,'m0001',NULL,'2020-04-15 09:07:14','normal'),(14,'m0001',NULL,'2020-04-15 09:07:36','normal'),(15,'m0001',NULL,'2020-04-15 09:12:23','normal'),(16,'m0001',NULL,'2020-04-15 09:17:18','vip'),(17,'m0001',NULL,'2020-04-15 10:34:16','vip'),(18,'m0001','3','2020-04-15 10:34:29','course_limit'),(19,'m0001',NULL,'2020-04-15 14:01:22','vip'),(20,'m0001',NULL,'2020-04-15 14:01:46','vip'),(21,'m0001',NULL,'2020-04-15 15:27:43','vip'),(22,'m0001',NULL,'2020-04-15 15:39:46','vip'),(23,'m0003','8','2020-04-15 15:40:11','times'),(24,'m0004','1','2020-04-15 15:44:27','times'),(25,'m0001',NULL,'2020-04-15 16:36:42','vip'),(26,'m0001',NULL,'2020-04-16 02:47:31','vip'),(27,'m0001',NULL,'2020-04-16 03:29:19','vip'),(28,'m0001',NULL,'2020-04-16 03:32:20','vip'),(29,'m0001',NULL,'2020-04-16 03:40:29','vip'),(30,'m0001',NULL,'2020-04-16 04:22:07','vip'),(31,'m0001',NULL,'2020-04-16 04:25:24','vip'),(32,'m0001',NULL,'2020-04-16 04:57:08','vip'),(33,'m0001',NULL,'2020-04-16 04:57:53','vip'),(34,'m0002','9','2020-04-16 04:59:08','times'),(35,'m0001',NULL,'2020-04-16 05:00:38','vip'),(36,'m0003','7','2020-04-16 05:02:15','times'),(37,'m0001',NULL,'2020-04-16 05:09:02','vip'),(38,'m0003','6','2020-04-16 05:09:23','times'),(39,'m0004','0','2020-04-16 05:17:51','times'),(40,'m0001',NULL,'2020-04-16 05:19:54','vip'),(41,'m0001',NULL,'2020-04-16 05:20:44','vip'),(42,'m0002','8','2020-04-16 05:21:04','times'),(43,'m0001',NULL,'2020-04-16 06:27:14','vip'),(44,'m0001',NULL,'2020-04-16 06:29:49','vip'),(45,'m0001',NULL,'2020-04-17 02:18:00','vip'),(46,'m0001',NULL,'2020-04-17 03:18:33','vip'),(47,'m0003','5','2020-04-17 03:18:55','times'),(48,'m0002','7','2020-04-17 03:19:19','times'),(49,'m0001',NULL,'2020-04-17 03:58:11','vip'),(50,'m0001',NULL,'2020-04-17 04:09:08','vip'),(51,'m0001',NULL,'2020-04-17 04:14:09','vip'),(52,'m0001',NULL,'2020-04-17 04:26:51','vip'),(53,'m0001',NULL,'2020-04-17 04:32:13','vip'),(54,'m0001',NULL,'2020-04-17 05:28:00','vip'),(55,'m0001',NULL,'2020-04-17 05:28:24','vip'),(56,'m0001',NULL,'2020-04-17 05:33:55','vip'),(57,'m0001',NULL,'2020-04-17 05:36:29','vip'),(58,'m0001',NULL,'2020-04-17 05:40:01','vip'),(59,'m0001',NULL,'2020-04-17 05:42:03','vip'),(60,'m0001',NULL,'2020-04-17 05:54:47','vip'),(61,'m0002','6','2020-04-17 05:55:08','times'),(62,'m0003','4','2020-04-17 05:55:41','times'),(63,'m0002','5','2020-04-17 05:57:12','times'),(64,'m0002','4','2020-04-17 05:57:43','times'),(65,'m0002','3','2020-04-17 05:58:02','times'),(66,'m0002','2','2020-04-17 05:58:20','times'),(67,'m0002','1','2020-04-17 05:58:39','times'),(68,'m0002','0','2020-04-17 05:58:56','times'),(69,'m0001',NULL,'2020-04-17 14:02:57','vip'),(70,'m0001',NULL,'2020-04-17 14:20:36','vip'),(71,'m0003','3','2020-04-17 14:22:00','times'),(72,'m0001',NULL,'2020-04-17 14:36:05','vip'),(73,'m0005','98','2020-04-17 14:36:28','times'),(74,'m0005','97','2020-04-17 14:36:55','times'),(75,'m0001',NULL,'2020-04-17 14:37:11','vip'),(76,'m0001',NULL,'2020-04-17 15:03:29','vip'),(77,'m0001',NULL,'2020-04-17 16:48:54','vip'),(78,'m0001',NULL,'2020-04-18 00:32:42','vip'),(79,'m0028','49','2020-04-18 05:26:19','times'),(80,'m0001',NULL,'2020-04-18 17:01:26','vip'),(81,'m0001',NULL,'2020-04-18 17:01:45','vip'),(82,'m0028','48','2020-04-18 17:02:13','times'),(83,'m0001',NULL,'2020-04-18 17:04:54','vip'),(84,'m0011','49','2020-04-18 18:43:59','times'),(85,'m0001',NULL,'2020-04-18 19:50:19','vip'),(86,'m0001',NULL,'2020-04-20 11:29:21','vip');
+/*!40000 ALTER TABLE `membergetinlog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `members`
+--
+
+DROP TABLE IF EXISTS `members`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `members` (
+  `id` varchar(5) DEFAULT NULL,
+  `name` varchar(4) DEFAULT NULL,
+  `birth` varchar(11) DEFAULT NULL,
+  `type` varchar(6) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `agent_name` varchar(3) DEFAULT NULL,
+  `agent_phone` varchar(10) DEFAULT NULL,
+  `agent_relation` varchar(2) DEFAULT NULL,
+  `address` varchar(18) DEFAULT NULL,
+  `nationID` varchar(10) DEFAULT NULL,
+  `quota` smallint(6) DEFAULT NULL,
+  `quota_tran_little` tinyint(4) DEFAULT NULL,
+  `quota_course_limit` tinyint(4) DEFAULT NULL,
+  `quota_course` tinyint(4) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `members`
+--
+
+LOCK TABLES `members` WRITE;
+/*!40000 ALTER TABLE `members` DISABLE KEYS */;
+INSERT INTO `members` VALUES ('m0001','測試帳號','1982-11-06','normal','00919155809','陳秀真','0933655311','母子','830龍成路92-2號','Q123362294',0,0,4,0),('m0002','楊智堯','1989-12-04','normal','0981283982','楊朝根','08-7337412','父子','不留','',0,0,0,0),('m0003','張峻銘','1983-10-27','normal','095599281','張育銘','0989303352','兄弟','屏東縣萬巒鄉萬和村南進路24之12號','',3,0,0,0),('m0004','蕭謙和','1987-01-22','normal','0903622153','蕭文方','0976861621','父子','不留','T123616914',0,0,0,0),('m0005','李和家','2001-11-16','normal','0965349033','李志明','0932856357','父子','高雄市鹽埕區公園路203號','E125321425',97,0,0,0),('m0006','黃柔甄','1984-03-10','normal','0976523393','蔡詠韻','08-7662037','母女','屏東市崇陽街131巷10號','S223452313',45,0,0,0),('m0007','林彩婷','1989-11-07','normal','0927279263','林慶雄','0911746663','父女','屏東市昆明街22巷7弄3號','T223738917',0,0,0,0),('m0008','丘兆洺','1991-07-07','normal','0970960311','施靜宇','0953129383','母子','屏東市工裕街353巷35弄30號','T124021491',0,0,0,0),('m0009','葉瑞煌','1974-2-27','normal','0935815805','葉太太','0958255616','夫妻','屏東市崇安街28巷1號','',0,0,0,0),('m0010','劉筱鈴','1981-08-26','normal','0983700232','黃柔甄','0976523393','朋友','屏東市華盛街19號8f之1','',100,0,0,0),('m0011','黃麗華','1973-11-28','normal','0932376315','韓中明','0929229321','夫妻','不留','',49,0,0,0),('m0012','張瓊文','1966-02-15','normal','0937383140','老公','0939871599','夫妻','屏東市莊敬街二段89巷29弄5號','',49,0,0,0),('m0013','鄭景鴻','1970-01-29','normal','0905366833','尤澤平','0926134330','夫妻','屏東市機場北路460號13樓','',0,0,0,0),('m0014','卓明珠','1969-12-23','normal','0966533111','卓明慧','0910401998','妹','屏東市香揚巷279號','',50,0,0,0),('m0015','游孟霖','1997-10-31','normal','0975971031','羅偲云','0936767802','母子','高雄市鳳山區建國路一段53巷68號','S124053296',100,0,0,0),('m0016','陳雨青','1997-02-10','normal','0919232756','陳文伶','0935599941','母親','不留','不留',0,0,0,0),('m0017','陳信陵','1975-08-31','normal','0932781719','黃惠萍','0931980792','夫妻','不留','不留',0,0,0,0),('m0018','許蜀茹','1978-08-29','normal','0931312251','許琳惟','0928784136','姊妹','不留','不留',0,0,0,0),('m0019','楊倍航','1989-02-16','normal','0932325859','陳寶伃','0919092038','夫妻','不留','不留',100,0,0,0),('m0020','石香莉','1971-06-02','normal','0920676238','廖文亮','0982191491','夫妻','屏東市公勇路77號14樓之9','T220123067',0,0,0,0),('m0021','潘楨棱','1981-10-05','normal','0981227522','陸一帆','0929951752','夫妻','屏東市中華路60號','T222670550',50,0,0,0),('m0022','林妤容','1981-08-14','normal','0931611291','不留','不留','不留','不留','不留',50,0,0,0),('m0023','黃惠萍','1981-07-15','normal','0931980792','黃明玉','0929683638','妹妹','不留','不留',20,0,0,0),('m0024','鍾佳玲','1965-02-01','normal','0910774535','王志明','0930835197','夫妻','屏東市德豐街216巷38號','不留',60,0,0,0),('m0025','趙崇志','1983-03-29','normal','0988638988','趙金輝','08-7342953','父子','不留','T123401280',0,0,0,0),('m0026','楊川德','1998-04-08','normal','0958401939','楊源利','0919173353','父子','屏東市湖西里歸義巷4-14號','T124373696',50,0,0,0),('m0027','杜浩維','1993-08-28','normal','0988165182','鄭麗巧','0987600826','母','不留','不留',0,0,0,0),('m0028','陳齊軒','1988-12-13','normal','0968113157','陳今殿','0927698868','父子','不留','不留',48,0,0,0),('m0029','柯宇杰','2000-02-21','normal','0978087272','柯勝雄','0915880899','父','不留','不留',0,0,0,0),('m0030','潘書寧','1979-06-02','normal','0955711897','潘蔚民','0925161895','兄','屏東市和平路528號','不留',0,0,0,0),('m0031','呂金峯','1986-04-25','normal','0955563979','呂媽媽','0960639181','母子','不留','不留',0,0,0,0),('m0032','黃柏瑜','2003-11-03','normal','0905593180','黃媽媽','0978620160','母','屏東市大連路13巷2弄2樓之1','T125892092',0,0,0,0),('m0033','何華倫','1983-11-16','normal','0988075400','羅秀花','0919121811','母','屏東縣瑪家鄉佳義村泰平巷105-2號','T123049020',50,0,0,0),('m0034','張淑賢','19988-02-29','normal','0958747794','張仲豪','0975553622','男友','不留','不留',50,0,0,0),('m0035','曾俊維','1984-09-09','normal','0980960035','林翰英','0955136761','母','屏東市貴陽街33號','T123447491',50,0,0,0),('m0036','顏妙芬','1978-11-22','normal','0986104527','張秀珍','0983358947','母女','屏東市貴陽街33號','T222514922',50,0,0,0),('m0037','顏妙芬','1978-11-22','normal','0986104527','張秀珍','0983358947','母女','屏東市貴陽街33號','T222514922',50,0,0,0),('m0038','aa','2020-04-01','normal','0aa','aa','aa','aa','aa','Q123362294',NULL,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `members` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sqlite_sequence`
+--
+
+DROP TABLE IF EXISTS `sqlite_sequence`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sqlite_sequence` (
+  `name` varchar(14) DEFAULT NULL,
+  `seq` smallint(6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sqlite_sequence`
+--
+
+LOCK TABLES `sqlite_sequence` WRITE;
+/*!40000 ALTER TABLE `sqlite_sequence` DISABLE KEYS */;
+INSERT INTO `sqlite_sequence` VALUES ('membergetinlog',722),('bulletin',3),('trans',11);
+/*!40000 ALTER TABLE `sqlite_sequence` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `staff`
+--
+
+DROP TABLE IF EXISTS `staff`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `staff` (
+  `id` varchar(5) DEFAULT NULL,
+  `name` varchar(6) DEFAULT NULL,
+  `birth` varchar(10) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `role` varchar(2) DEFAULT NULL,
+  `agent_name` varchar(3) DEFAULT NULL,
+  `agent_phone` varchar(20) DEFAULT NULL,
+  `agent_relation` varchar(2) DEFAULT NULL,
+  `nationID` varchar(10) DEFAULT NULL,
+  `address` varchar(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `staff`
+--
+
+LOCK TABLES `staff` WRITE;
+/*!40000 ALTER TABLE `staff` DISABLE KEYS */;
+INSERT INTO `staff` VALUES ('s0001','員工測試帳號','1982-11-06','0919155809','業務','陳秀真','0933655311','母子','Q123362294','830龍成路92-2號'),('s0002','bb','2020-04-12','bb','業務','bb','bb','bb','Q123362294','bb');
+/*!40000 ALTER TABLE `staff` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `staffgetinlog`
+--
+
+DROP TABLE IF EXISTS `staffgetinlog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `staffgetinlog` (
+  `getinid` varchar(0) DEFAULT NULL,
+  `staffid` varchar(0) DEFAULT NULL,
+  `timestamp` varchar(0) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `staffgetinlog`
+--
+
+LOCK TABLES `staffgetinlog` WRITE;
+/*!40000 ALTER TABLE `staffgetinlog` DISABLE KEYS */;
+/*!40000 ALTER TABLE `staffgetinlog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trans`
+--
+
+DROP TABLE IF EXISTS `trans`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `trans` (
+  `transid` int(11) NOT NULL AUTO_INCREMENT,
+  `memberid` varchar(5) DEFAULT NULL,
+  `staffid` varchar(5) DEFAULT NULL,
+  `startdate` varchar(10) DEFAULT NULL,
+  `enddate` varchar(10) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `price` smallint(6) DEFAULT NULL,
+  `membertype` varchar(12) DEFAULT NULL,
+  `quota_course_limit` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`transid`)
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trans`
+--
+
+LOCK TABLES `trans` WRITE;
+/*!40000 ALTER TABLE `trans` DISABLE KEYS */;
+INSERT INTO `trans` VALUES (11,'m0002','s0001','2020-02-20','','2020-04-09 16:00:00',1200,'times',0),(41,'m0001','s0001','2020-04-05','2020-04-11','2020-04-12 10:21:08',6500,'course_limit',5),(42,'m0001','s0001','2020-04-12','2020-04-18','2020-04-12 10:28:12',6500,'course_limit',0),(43,'m0001','s0001','2020-04-13','2020-04-18','2020-04-15 10:34:29',6500,'course_limit',3),(44,'m0001','s0001','2020-04-01','2020-04-11','2020-04-12 10:30:58',1300,'normal',NULL),(45,'m0001','s0001','2020-04-12','2020-04-13','2020-04-12 10:56:51',6500,'course_limit',3),(46,'m0001','s0001','2020-04-15',NULL,'2020-04-15 06:22:24',1200,'times',NULL),(48,'m0001','s0001','2020-04-15','2020-04-30','2020-04-15 09:16:59',3200,'vip',NULL),(49,'m0002','s0001','2020-04-16',NULL,'2020-04-16 04:58:43',1200,'times',NULL);
+/*!40000 ALTER TABLE `trans` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2020-04-21  5:32:00

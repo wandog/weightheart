@@ -1,0 +1,14 @@
+[Unit]
+Description=Flask server
+after=network.target
+
+[Service]
+User=pi
+ExecStart=/usr/bin/python /home/pi/test_code/web_flask/hello.py
+WorkingDirectory=/home/pi/test_code/web_flask
+Restart=always
+RestartSec=10s
+TimeoutSec=infinity
+
+[Install]
+WantedBy=multi-user.target

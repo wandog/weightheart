@@ -42,8 +42,8 @@ time.sleep(1)
 #proc.init(device)
 #proc.visible=True
 #################################
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('192.168.1.117', 54321))
+#sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#sock.connect(('192.168.1.123', 54321))
 
 lock=threading.Lock()
 
@@ -199,16 +199,16 @@ def showBulletin():
         
     #conn.close()
 t1=threading.Thread(target=automation)
-t2=threading.Thread(target=showBulletin)
+#t2=threading.Thread(target=showBulletin)
 
 t1.start()
-t2.start()
+#t2.start()
 
 t1.join()
-t2.join()
+#t2.join()
 
 
-sock.close()
+#sock.close()
     
 
 
