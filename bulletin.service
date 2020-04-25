@@ -1,0 +1,15 @@
+[Unit]
+Description=Electronic Bulletin
+#after=mariadb.service
+[Service]
+User=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStart=/usr/bin/python /home/pi/test_code/touch/tk_test1.py
+Restart=always
+RestartSec=10s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=graphical.target
